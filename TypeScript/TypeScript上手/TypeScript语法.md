@@ -19,7 +19,6 @@ class Person {
 }
 
 // 简写
-
 class Person {
   constructor(public name: string, public age: string) {}
 }
@@ -42,6 +41,9 @@ class Person {
 
 定义结构和格式，确保代码一致性，不能包含实现。
 
+- 接口可以继承接口。
+- 接口重复定义会自动合并。
+
 ```ts
 interface test {
   name: string
@@ -49,7 +51,8 @@ interface test {
 }
 
 // 类（implements：实现）
-class testClass implements test {
+// implements test,test2 这样写可以实现多个接口
+class TestClass implements test {
   constructor(public name: string) {}
   speak(n: string): void {
     console.log(this.name, n)
@@ -65,8 +68,70 @@ const testObj: test = {
 }
 
 // 函数
-
 interface test2 {
   (a: number, b: number): number
 }
+
+const testFn = (x, y) => {
+  return x + y
+}
 ```
+
+### interface 和 type
+
+都支持定义对象的结构
+
+- interface 更专注对象和类，支持继承和合并。
+- type 支持类型别名、交叉类型、联合类型，不能继承和合并。
+
+### interface 和 抽象类
+
+都支持定义类的结构
+
+- interface 只能描述结构，不能有实现，一个类可以实现多个接口。
+- 抽象类 既可以有抽象的方法，也可以有具体的实现，一个类只能继承一个抽象类。
+
+## 泛型
+
+定义函数、类和接口时，用类型参数来表示未指定的类型，使用时才知道具体的类型，安全的保证同一段代码适应多种类型。
+
+```ts
+// 泛型函数
+const log = <T, U>(data1: T, data2: U): T | U => {
+  return data1 % 2 ? data1 : data2
+}
+
+log<number, string>(1, "1")
+log<number, boolean>(1, true)
+
+// 泛型接口
+interface test<T> {
+  name: string
+  info: T
+}
+
+type infoType = {
+  title: string
+}
+
+let p: test<infoType> = {
+  name: "123",
+  info: {
+    title: "123",
+  },
+}
+
+// 泛型类
+class Test2<T> {
+  constructor(public name: string, public info: T) {}
+  speak() {
+    console.log(this.name, this.info)
+  }
+}
+
+const p2 = new Test2<infoType>("123", { title: "123" })
+```
+
+## 类型声明文件
+
+xxx.d.ts 文件，为现有的 js 文件提供类型信息。
