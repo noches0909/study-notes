@@ -53,7 +53,7 @@ function App() {
 
 > 解释型语言 js 编译效率低，扫描器 Scanner，词法分析语法分析后转为 ast 语法树，再经过一系列的操作才转为机器码
 
-## 3. vdom、fiber 和 diff
+## 3. vdom、fiber、diff 和 schedule（调度器）
 
 vdom：
 
@@ -67,9 +67,23 @@ React Fiber：React16 引入该架构，解决大文件卡顿问题
 - 双缓存树，更新前后状态比对
 - 任务切片
 
-浏览器一帧执行的任务最后，如果有空闲时间，会执行 requestidleCallback（并非调用该原生方法，而是使用这个思想）
+浏览器一帧执行的任务最后，如果有空闲时间，会执行 requestIdleCallback（并非调用该原生方法，而是使用这个思想）
 
-在 requestidleCallback 中执行耗时任务，并分帧执行（比如处理 10000 个元素，分成 3 帧，3000、3000、4000）
+在 requestIdleCallback 中执行耗时任务，并分帧执行（比如处理 10000 个元素，分成 3 帧，3000、3000、4000）
 
 原虚拟 DOM 结构：React => (A + B +C)
 Fiber 链表结构：React => A => B => C 且可回溯
+
+react 选择使用 MessageChannel 替代原生的 requestIdleCallback 来实现调度，如果浏览器不支持 MessageChannel 就会使用 setTimeout
+
+- requestIdleCallback 兼容性差、精细度不够，执行间隔为 50ms
+- setTimeout 嵌套调用超过 5 次，会强制超时 4 毫秒执行
+- MessageChannel 可以 0 延迟
+
+## 4. hooks
+
+### 4.1 useState
+
+初始化 useState 可以传函数（必须带有 reture），且只会执行一次
+
+setState 设计为了异步渲染，为了性能优化，多个重复性的 setState 在队列中会进行后续阻断，可以理解为自带防抖，最后才会 render，可以通过传入回掉函数以更新的方式来解决异步渲染
