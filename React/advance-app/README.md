@@ -127,3 +127,12 @@ const res = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 - 手写实现一个订阅 history 实现路由跳转的 hook[useHistory](./src/hooks/useHistory.ts)
 
 getSnapshot 的返回值，如果不是上一次的的引用类型，那么 React 会重新渲染，如果总是不一样，那么就会陷入死循环。
+
+### 4.4 useTransititon（优先级不高）
+
+在实际工作中使用较少，管理 UI 的过渡状态，不阻塞 UI 的情况下更新状态，原理其实就是降低优先级。
+
+```tsx
+// startTransition仅能同步使用
+const [isPending, startTransition] = useTransition()
+```
