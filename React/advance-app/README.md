@@ -114,7 +114,7 @@ setState((draft) => {
 })
 ```
 
-### 4.3 useSyncExternalStore
+### 4.4 useSyncExternalStore
 
 主要用于管理外包存储的数据状态，redux、Zustand、storage 等
 
@@ -128,11 +128,21 @@ const res = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
 getSnapshot 的返回值，如果不是上一次的的引用类型，那么 React 会重新渲染，如果总是不一样，那么就会陷入死循环。
 
-### 4.4 useTransititon（优先级不高）
+### 4.5 useTransititon（优先级不高）
 
-在实际工作中使用较少，管理 UI 的过渡状态，不阻塞 UI 的情况下更新状态，原理其实就是降低优先级。
+在实际工作中使用较少，管理 UI 的过渡状态，不阻塞 UI 的情况下更新状态，原理其实就是降低优先级，可用于列表的渲染优化。
 
 ```tsx
 // startTransition仅能同步使用
 const [isPending, startTransition] = useTransition()
 ```
+
+### 4.6 useDeferredValue
+
+延迟某些状态的更新，相比于 useTransititon 所关注的状态过渡，useDeferredValue 更关注单个值的延迟更新，可用于比如输入框的性能优化。
+
+```tsx
+const deferredValue = useDeferredValue(value)
+```
+
+> 它很像防抖，但并不是，延迟时间无法手动设置，看用户的机器性能
