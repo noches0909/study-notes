@@ -146,3 +146,52 @@ const deferredValue = useDeferredValue(value)
 ```
 
 > 它很像防抖，但并不是，延迟时间无法手动设置，看用户的机器性能
+
+### 4.7 useEffect
+
+- 纯函数：可预测，不依赖和改变外部的状态
+- 副作用函数：可预测性降低，高耦合，会依赖或改变外部的状态
+
+```tsx
+// setup: 处理函数，页面挂载完成后执行，可以return一个清理函数cleanup，页面卸载后执行
+// 依赖项要更新时，更新前执行cleanup，更新后执行setup，即防抖
+useEffect(setup, dependencies)
+// dependencies可选，数组
+// 不传，任何状态改变都会执行
+// 传空数组，仅初始化执行
+// 传数组，依赖项改变后执行
+```
+
+### 4.8 useLayoutEffect
+
+用法与 useEffect 一致
+
+- useLayoutEffect 浏览器重新绘制屏幕前执行，且同步，会阻塞 dom 渲染
+- useEffect 浏览器完成布局和绘制后执行，且异步，不阻塞 dom 渲染
+- useInsertionEffect 很早在 dom 插入前就执行了，通常用于样式注入
+
+### 4.9 useRef
+
+操作 DOM、存储数据
+
+- react 的 ref，只是一个普通的 js 对象非响应式，通过.current 获取值。
+- vue 的 ref，是响应式对象，通过.value 获取值。
+
+关于数据存储：
+
+通常在操作 setState 时会重新渲染组件，普通的变量也会被初始化，而 useRef 并不会跟着组件重新渲染，所以适合存储数据
+
+### 4.10 useImperativeHandle
+
+字组件内部暴露给父组件方法或属性，类似 Vue 的 defineExpose
+
+```tsx
+useImperativeHandle(
+  ref,
+  () => ({
+    name: 123,
+    fn: () => {},
+  }),
+  []
+)
+```
