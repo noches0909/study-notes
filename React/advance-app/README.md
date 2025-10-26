@@ -183,7 +183,7 @@ useEffect(setup, dependencies)
 
 ### 4.10 useImperativeHandle
 
-字组件内部暴露给父组件方法或属性，类似 Vue 的 defineExpose
+子组件内部暴露给父组件方法或属性，类似 Vue 的 defineExpose
 
 ```tsx
 useImperativeHandle(
@@ -192,6 +192,34 @@ useImperativeHandle(
     name: 123,
     fn: () => {},
   }),
-  []
+  [] // 依赖项
 )
 ```
+
+### 4.11 useContext
+
+解决 props 只能一层一层传递的问题，实现祖孙级别的传值，类似 vue 的 provide 和 inject
+
+### 4.12 useMemo
+
+useContext、组件的 props 和 state 发生变化会触发组件的重新渲染
+
+React.memo：使用 React.memo 函数包裹子组件可以避免组件重新渲染，优化性能
+
+useMemo：缓存上一次计算的值，类似 vue 的 computed
+
+### 4.13 useCallback
+
+缓存函数
+
+涉及到父子组件通信时，父组件传入函数供子组件调用，即使字组件被 memo 包裹了，在调用该函数时也会重新渲染子组件，可以通过 usecallback 包裹该函数解决
+
+> 父组件触发重新渲染后，即使 props 没变，但会导致传给子组件的函数内存地址不一致了，从而会触发子组件的重新渲染
+
+### 4.14 usedebugValue
+
+用来调试自定义 Hook
+
+### 4.15 useId
+
+生成稳定的唯一 ID，服务端渲染 SSR 用的比较多
