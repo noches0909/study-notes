@@ -223,3 +223,80 @@ useMemo：缓存上一次计算的值，类似 vue 的 computed
 ### 4.15 useId
 
 生成稳定的唯一 ID，服务端渲染 SSR 用的比较多
+
+### 4.16 use
+
+react19 新增，用来获取组件中 promise 返回的内容、context 的内容等
+
+### 5. 组件
+
+### 5.1 父子组件传值
+
+props：父传子属性和方法
+
+props.children 里包含“插槽”
+
+### 5.2 兄弟组件传值
+
+发布订阅模式：vue event bus、window.addEventListener、mitt
+
+```tsx
+// 发布方
+const e = new.event("on-test")
+const handleTap = () => {
+  e.params = { name: "参数" }
+  window.dispatchEvent(e)
+}
+
+// 接受方
+window.addEventListener("on-test", (e) => {
+  console.log(e.params)
+})
+```
+
+### 5.3 受控组件与非受控组件
+
+受控组件：通常指表单元素，由 state 和 onchange 来管理，类似 vue 的 v-model
+
+非受控组件：通常由 useRef() 来获取值，操作 dom 来管理
+
+input file 是一个非受控组件，不能用 state 管理
+
+### 5.4 异步组件 Suspense
+
+- 代码分包按需加载，优化首页性能
+- 数据请求中的优雅过渡，骨架屏等
+- 图片加载前的占位，如瀑布流
+
+```tsx
+// lazy会分包代码，按需加载
+const AsyncComponent = lazy(() => import("./components/Async"))
+const App = () => {
+  // AsyncComponent组件加载中会先显示fallback的内容，加载完成后再展示组件内容
+  return (
+    <Suspense fallback={<div>loading...</div>}>
+      <AsyncComponent />
+    </Suspense>
+  )
+}
+```
+
+### 5.5 高阶组件 HOC（Higher Order Component）
+
+不常用，可以理解为二次封装组件，通常出现在类组件中，with 开头的命名
+
+### 6 createProtal
+
+将一个组件渲染到指定 DOM 的位置，弹窗、遮罩、模态框等，类似 vue 的 Teleportl
+
+```tsx
+import { createProtal } from "react-dom"
+
+const App = () => {
+  // children：要渲染的组件
+  // domNode：渲染的制定DOM位置
+  // key可选：唯一标识
+  // return一个jsx
+  return createProtal(<div>test</div>, document.body)
+}
+```
