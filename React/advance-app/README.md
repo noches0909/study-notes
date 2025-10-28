@@ -285,7 +285,7 @@ const App = () => {
 
 不常用，可以理解为二次封装组件，通常出现在类组件中，with 开头的命名
 
-### 6 createProtal
+## 6 createProtal
 
 将一个组件渲染到指定 DOM 的位置，弹窗、遮罩、模态框等，类似 vue 的 Teleportl
 
@@ -300,3 +300,27 @@ const App = () => {
   return createProtal(<div>test</div>, document.body)
 }
 ```
+
+## 7 CSS
+
+react 并没有 vue 的 scoped 功能，但是同为 SPA 单页应用，需要解决样式作用域的问题
+
+### 7.1 css-modules
+
+文件名：xxx.module.[css|less|sass|stylus]，在组件中引入该文件，随后在元素上 `className={styled.app}` 这样写即可
+
+[修改 css modules 规则](./vite.config.ts)：在 vite 中配置，会透传给 postcss-modules
+
+**维持类名：** 即不使用模块化的类名，直接使用类名
+
+在样式文件中这样写：`:global(.app) {}`，会将该样式提升为全局样式
+
+### 7.2 css-in-js
+
+不是一门技术，而是一种思想，通过 js 来驱动 css，如今不是太推荐，我们更希望 css 和 js 能分离
+
+可以使用插件：styled-components
+
+### 7.3 原子化 css
+
+元素上类名过多时，可以在样式文件中 @apply 统一收纳

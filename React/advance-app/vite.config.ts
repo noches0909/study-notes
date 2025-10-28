@@ -30,5 +30,14 @@ const viteMockServe = (): Plugin => {
 
 // https://vite.dev/config/
 export default defineConfig({
+  css: {
+    modules: {
+      // camelCase 会将类名转换为驼峰形式，并保留原始类名
+      // camelCaseOnly 也会将类名转换为驼峰形式，但会移除原始类名
+      // dashes 会将类名中的连字符转换为驼峰形式，并保留原始类名
+      // dashesOnly 会将类名中的连字符转换为驼峰形式，但会移除原始类名
+      localsConvention: "camelCase",
+    },
+  },
   plugins: [react(), viteMockServe()],
 })
