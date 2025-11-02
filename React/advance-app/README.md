@@ -324,3 +324,15 @@ react 并没有 vue 的 scoped 功能，但是同为 SPA 单页应用，需要�
 ### 7.3 原子化 css
 
 元素上类名过多时，可以在样式文件中 @apply 统一收纳
+
+### 8 路由 Router
+
+V7 版本不需要再安装 react-router-dom 库，已经合并到 react-router 库里面了
+
+- createBrowserRouter：html5 history 模式，需要服务器额外支持
+
+- createHashRouter：#哈希，无需服务器支持
+
+- createMemoryRouter：内存中完成虚拟化路由，url 不会变化，RN、Electorn、Jest、Vitest 中使用
+
+- createStaticRouter：服务端渲染 SSR 使用
