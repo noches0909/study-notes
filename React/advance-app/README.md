@@ -336,3 +336,19 @@ V7 版本不需要再安装 react-router-dom 库，已经合并到 react-router 
 - createMemoryRouter：内存中完成虚拟化路由，url 不会变化，RN、Electorn、Jest、Vitest 中使用
 
 - createStaticRouter：服务端渲染 SSR 使用
+
+导航的 NavLink 是 Link 的增强版，新增了三种状态：active（激活，路由和 to 匹配）、pending（等待，loader 数据加载）、transitioning（过渡，viewTransition 触发）
+
+**数据路由：**
+
+- loader：路由进入前加载数据，loader 的返回值会挂载到 useLoaderData 中，在组件中可以配合错误边界和延迟加载使用
+
+- action：路由内处理提交操作，Form 的提交会自动触发 action，完成后再刷新 loader，保证一致
+
+- ErrorBoundary：捕获 loader 和 action 的错误，展示专门的组件
+
+### 9 状态管理 Zustand
+
+Redux 太老太繁琐了，Zustand 十分轻量（1kb），简单上手无需组件包裹，易于集成适配 vue，强扩展性（中间件）且无副作用
+
+[一个快速上手的例子](./store/price.ts)
