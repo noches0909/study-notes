@@ -352,3 +352,39 @@ V7 版本不需要再安装 react-router-dom 库，已经合并到 react-router 
 Redux 太老太繁琐了，Zustand 十分轻量（1kb），简单上手无需组件包裹，易于集成适配 vue，强扩展性（中间件）且无副作用
 
 [一个快速上手的例子](./store/price.ts)
+
+#### 9.1 中间件
+
+**immer**
+
+用以简化状态更新，set 时，面对深层次结构的数据，可以不再拷贝原数据统一替换了，直接修改对应数据的值即可
+
+原理是通过 proxy 代理对象的操作
+
+- 写时复制：无修改时直接返回原对象，有修改时才返回新对象
+- 惰性代理：按需创建，proxy 拦截，延迟代理
+
+**persist**
+
+用以持久化状态，可以将 zustand 存在内存中的数据存入 localStorage 等
+
+#### 9.2 useShallow
+
+可以通过解构的方式获取状态，并且不会造成额外的渲染
+
+```tsx
+const { test1, test2 } = useTestStore(
+  useShallow((state) => ({
+    test1: state.test.test1,
+    test2: state.test2,
+  }))
+)
+```
+
+#### 9.3 订阅 subscribe
+
+为了解决我们只想通过修改某个状态来简单的获取信息，但却造成了大量组件的重复渲染问题，可以配合 subscribeWithSelector 中间价使用
+
+可以理解为 vue 中的 watch
+
+### 10 Hello World
