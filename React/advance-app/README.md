@@ -388,3 +388,7 @@ const { test1, test2 } = useTestStore(
 可以理解为 vue 中的 watch
 
 ### 10 Hello World
+
+需求：点击按钮能插入固定的变量在输入框中，输入框能显示标签。
+
+完成：[点这里](./src/pages/home.tsx)

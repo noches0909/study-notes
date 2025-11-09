@@ -1,5 +1,6 @@
 import ChipVariableEditor from "../components/ChipVariableEditor"
 import ChipTextarea from "../components/ChipTextarea"
+import SlateVariableEditor from "../components/SlateVariableEditor"
 
 const homeStyles = `
 .home-page {
@@ -43,6 +44,11 @@ const Home = () => {
           <h2>Textarea 叠加方案</h2>
           <p>保留原有 textarea 叠加实现，方便对比两种占位符输入方式。</p>
           <ChipTextarea />
+        </section>
+        <section className="home-section">
+          <h2>富文本编辑器方案（Slate）</h2>
+          <p>集成成熟的 Slate 编辑器，支持段落输入并以内联标签插入变量。</p>
+          <SlateVariableEditor description="变量以不可编辑标签展示，可继续输入富文本内容。" />
         </section>
       </div>
     </>

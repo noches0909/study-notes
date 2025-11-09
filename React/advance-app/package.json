@@ -15,6 +15,8 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router": "^7.9.5",
+    "slate": "^0.118.1",
+    "slate-react": "^0.119.0",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
