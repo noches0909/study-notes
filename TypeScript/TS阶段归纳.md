@@ -60,3 +60,12 @@ function fn(ids: number | number[]): number[] {
   }
 }
 ```
+
+## 类型断言
+
+编译期指令，不会强制运行时校验
+
+```ts
+const el = document.getElementById("app") as HTMLDivElement // jsx中更推荐
+const el = <HTMLDivElement>document.getElementById("app")
+```
