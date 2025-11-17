@@ -69,3 +69,16 @@ function fn(ids: number | number[]): number[] {
 const el = document.getElementById("app") as HTMLDivElement // jsx中更推荐
 const el = <HTMLDivElement>document.getElementById("app")
 ```
+
+## symbol
+
+```tsx
+// symbol意味唯一类型，所以a1和a2的值不相等
+let a1: symbol = Symbol(1)
+let a2: symbol = Symbol(1)
+
+// for会全局查看有没有注册过该key，有的话直接使用，没有才创建新的
+Symbol.for("1") === Symbol.for("1") // true
+```
+
+正常 for in、Object.keys、无法获取到 symbol 属性，使用`Reflect.ownKeys()`可以遍历到
