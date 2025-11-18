@@ -82,3 +82,32 @@ Symbol.for("1") === Symbol.for("1") // true
 ```
 
 正常 for in、Object.keys、无法获取到 symbol 属性，使用`Reflect.ownKeys()`可以遍历到
+
+## 泛型
+
+理解为动态类型
+
+**泛型约束**
+
+`extends` 关键字，前面的类型只能被约束为后面的类型
+
+```tsx
+interface Data {
+  name: string
+  age: number
+}
+
+type Options<T extends object> = {
+  readonly [key in keyof T]: T[key]
+}
+
+type B = Options<Data>
+```
+
+## 命名空间
+
+隔离类型，避免全局污染
+
+namespace 里面的变量和方法必须要导出才可以使用，支持嵌套，命名空间也需要导出，支持合并、简化
+
+可以用在跨端项目中，为不同的平台提供不同的变量方法
