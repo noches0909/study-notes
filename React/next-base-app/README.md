@@ -30,11 +30,11 @@ Next.js：开箱即用的静态生产、SSR 服务端渲染和 SEO 优化
 
 - loading：page 异步加载时显示的组件
 
-- error：必须客户端渲染，加载报错的组件
+- error：必须客户端运行，加载报错的组件
 
 - not-found（全局）：404 显示
 
-next 组件默认是服务端渲染的，如果要使用 useState 之类的交互语法需要在组件顶部声明`use client`转为客户端渲染
+next 组件默认是在服务端运行的，如果要使用 useState 之类的交互语法需要在组件顶部声明`use client`转为客户端运行
 
 ### 路由导航
 
