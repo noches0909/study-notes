@@ -117,3 +117,36 @@ namespace 里面的变量和方法必须要导出才可以使用，支持嵌套�
 d.ts：声明文件后缀
 
 `declare`关键字可以扩充变量、方法、类等，变为全局
+
+## 装饰器
+
+在不修改原结构的情况下，通过装饰器为类添加属性和方法
+
+## proxy 和 reflect
+
+- proxy 用于创建一个对象的代理，从而可以对该对象进行拦截和修改
+
+- reflect 用于操作对象的底层方法
+
+```ts
+const obj = {
+  name: "proxy",
+  age: 18,
+}
+
+// object.name 等效
+// Reflect.get(obj, "name")
+
+let objProxy = new Proxy(obj, {
+  get(target, prop, receiver) {
+    console.log("get", prop)
+    return Reflect.get(target, prop, receiver)
+  },
+  set(target, prop, value, receiver) {
+    console.log("set", prop, value)
+    return Reflect.set(target, prop, value, receiver)
+  },
+})
+
+// reflect 的第三个参数用于确定 this 指向
+```
