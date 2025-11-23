@@ -66,6 +66,30 @@ permanentRedirect：308 永久重定向
 
 使用平行路由时，为避免硬导航（手动刷新）页面导航至子路由产生 404，我们可以在路由下面新建 default 文件进行兜底
 
-#### 路由组
+### 路由组
 
 大型项目做分类用的，这样写：`(admin)`，这个文件仅用来分类，不会显示到 url。可以在单独的路由组里写 layout，路由文件名不可互相重复
+
+### 路由处理程序
+
+接口文件规范：必须得是 route.ts
+
+[后端接口处理 demo](./src/app/api/user/route.ts)
+
+[测试请求](./test.http)
+
+## Cookie 实战
+
+安装 shadcn 来模拟前端登录
+
+```sql
+bunx --bun shadcn@latest init
+bunx --bun shadcn@latest add button
+bunx --bun shadcn@latest add input
+```
+
+[登录页](./src/app/page.tsx)
+
+[首页](./src/app/home/page.tsx)
+
+[登录接口和检查 token 接口](./src/app/api/login/route.ts)
