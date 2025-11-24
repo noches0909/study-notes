@@ -93,3 +93,29 @@ bunx --bun shadcn@latest add input
 [首页](./src/app/home/page.tsx)
 
 [登录接口和检查 token 接口](./src/app/api/login/route.ts)
+
+## Proxy 代理
+
+16 以前称之为 middleware 中间件
+
+处理跨域、接口转发、第三方限流、鉴权
+
+[Proxy 代理示例](./src/proxy.ts)
+
+> 注意：此处的 Proxy 并不是 vite、webpack 的 dev server 的 proxy 配置，而是 服务端路由层面的代理，在生产环境也同样适用
+
+## BFF
+
+backend for frontend，即前端的后端。
+
+Next.js 虽然是全栈框架，并且能写供前端调用的接口，但它本质上仍是通过 Node.js 加一层中间件（BFF），以沟通前后端，在大型项目中并不能替代后端。
+
+这样做的好处：
+
+1. 跨域和转发，不需要借助其它工具，直接在 proxy 里配置即可
+
+2. 鉴权，统一处理 cookie、token、session
+
+3. 可以访问一些前端无法访问的内部接口
+
+4. 安全，隐藏真实接口地址，用户无法绕过前端直接访问后端了
