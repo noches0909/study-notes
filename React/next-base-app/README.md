@@ -119,3 +119,13 @@ Next.js 虽然是全栈框架，并且能写供前端调用的接口，但它本
 3. 可以访问一些前端无法访问的内部接口
 
 4. 安全，隐藏真实接口地址，用户无法绕过前端直接访问后端了
+
+## 渲染方式
+
+- CSR(Client Side Rendering)：客户端渲染，Vue、React、Angular
+
+- SSR(Server Side Rendering)：服务端渲染，Next.js、Nuxt.js
+
+- SSG(Static Site Generation)：静态站点生成，VitePress、Astro
+
+**Hydration 水合**：服务端渲染生成的 HTML 到达浏览器后，React 会将其转为可交互的页面，这个过程称为水合
