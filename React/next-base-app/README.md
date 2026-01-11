@@ -120,7 +120,9 @@ Next.js 虽然是全栈框架，并且能写供前端调用的接口，但它本
 
 4. 安全，隐藏真实接口地址，用户无法绕过前端直接访问后端了
 
-## 渲染方式
+## 组件
+
+### 渲染方式
 
 - CSR(Client Side Rendering)：客户端渲染，Vue、React、Angular
 
@@ -130,7 +132,7 @@ Next.js 虽然是全栈框架，并且能写供前端调用的接口，但它本
 
 **Hydration 水合**：服务端渲染生成的 HTML 到达浏览器后，React 会将其转为可交互的页面，这个过程称为水合
 
-## RSC
+### RSC
 
 React Server Component 服务器组件
 
@@ -142,6 +144,38 @@ React Server Component 服务器组件
 
 - 减少 bundle 体积，服务器组件在服务器渲染
 
+- 可以使用 Node 相关的 API 操作数据库
+
 - 局部水合客户端组件
 
 - 流式加载，边渲染边返回
+
+可以使用`server only`插件，限制只能在服务端调用。
+
+### 缓存组件
+
+Next16 新增的机制，实现了静态内容，动态内容，缓存内容的混合编排，需要在`next.config.ts`文件中将`cacheComponents`属性设为 true
+
+- 静态内容：本地文件模块，纯计算数据。构建时预渲染，直接编译成 html。
+
+- 动态内容：featch，Cookie，Header，Url 等。用户发起请求才会渲染，不会缓存。
+
+- 缓存内容：缓存动态数据，缓存后纳入静态外壳。
+
+动态内容需配合 Suspense 组件包裹使用，未渲染时占位。
+
+使用 featch 等 api 会自动使组件变成动态内容，但如果我们有时候想要手动实现动态内容，比如`Math.random()`，就需要借助`await connection()`。
+
+在函数组件内顶部加上`use cache`可以形成缓存内容。可以使用`cacheLife()`来配置缓存参数进行精细化控制
+
+### 缓存策略
+
+Next 会尽可能多的缓存我们的内容，但有时候我们不需要这样的优化，对于`cacheComponents`未设置为 true 的情况，有这几种方式解决缓存：
+
+- `export const revalidate = 0` 组件重新渲染时间（S）
+
+- `export const dynamic = 'force-dynamic'` 组件以动态方式编译
+
+- `{cache: 'no-store'}`接口加参数，不缓存接口
+
+对于`cacheComponents`设置为 true 的情况，`export const dynamic = 'force-dynamic'`就没有意义了。
