@@ -209,3 +209,19 @@ Next内置的图片组件，是对img标签的拓展
 ### Script组件
 
 支持在组件里添加脚本
+
+## SSG
+
+SSG静态导出。适用于博客、官网、文档的项目，一切动态功能api都会失效。
+
+next.config.ts 中配置 `output: 'export'`
+
+## MDX
+
+在markdown中使用react组件，需要额外安装插件。
+
+## 服务器函数 ServerActions
+
+可以在服务器端处理表单的提交，状态的校验管理等。
+
+使用原生的form，button必须写上`type="submit"`，推荐用zod库进行数据校验，因为需要在客户端组件使用交互，所以这样的服务器函数需要存放在专门的`src/app/lib`中。
