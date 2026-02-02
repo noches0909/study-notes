@@ -9,6 +9,7 @@
 Next.js：开箱即用的静态生产、SSR 服务端渲染和 SEO 优化
 
 - Turbopack：Rust 编写，性能比 webpack 强非常多
+
   - 支持多环境统一，不再需要拆分拼接了
   - 惰性打包：仅打包需要用到的内容
   - 增量计算：多核工作、函数级缓存
@@ -179,49 +180,49 @@ Next 会尽可能多的缓存我们的内容，但有时候我们不需要这样
 
 对于`cacheComponents`设置为 true 的情况，`export const dynamic = 'force-dynamic'`就没有意义了。
 
-### Image组件
+### Image 组件
 
-Next内置的图片组件，是对img标签的拓展
+Next 内置的图片组件，是对 img 标签的拓展
 
 优化尺寸适配现代图片格式，视觉稳定，支持懒加载，灵活按需调整大小
 
 属性：
 
-- loading：eager立即加载、lazy懒加载（默认），通常首屏不需要懒加载
+- loading：eager 立即加载、lazy 懒加载（默认），通常首屏不需要懒加载
 
 - preload：提升加载优先级
 
-- src：支持直接导入（/public/xxx.png）、静态导入（顶层import）、动态导入（组件内import后default）
-  其中直接导入需要确定宽高（或者使用fill，撑满），其余两种导入不用，因为在引入的时候就获取到信息了。
+- src：支持直接导入（/public/xxx.png）、静态导入（顶层 import）、动态导入（组件内 import 后 default）
+  其中直接导入需要确定宽高（或者使用 fill，撑满），其余两种导入不用，因为在引入的时候就获取到信息了。
 
 加载远程在线图片时无法直接使用，因为原则上只支持同域名下的文件，需要进行额外的配置策略协议。
 
-还可以配置策略转化格式为avif或webp，以达到缩小体积却不失真的效果。
+还可以配置策略转化格式为 avif 或 webp，以达到缩小体积却不失真的效果。
 
-[next配置文件 - images](./next.config.ts)
+[next 配置文件 - images](./next.config.ts)
 
-### font字体
+### font 字体
 
 - 内置：next/font/google
 
 - 本地：next/font/local
 
-### Script组件
+### Script 组件
 
 支持在组件里添加脚本
 
 ## SSG
 
-SSG静态导出。适用于博客、官网、文档的项目，一切动态功能api都会失效。
+SSG 静态导出。适用于博客、官网、文档的项目，一切动态功能 api 都会失效。
 
 next.config.ts 中配置 `output: 'export'`
 
 ## MDX
 
-在markdown中使用react组件，需要额外安装插件。
+在 markdown 中使用 react 组件，需要额外安装插件。
 
 ## 服务器函数 ServerActions
 
 可以在服务器端处理表单的提交，状态的校验管理等。
 
-使用原生的form，button必须写上`type="submit"`，推荐用zod库进行数据校验，因为需要在客户端组件使用交互，所以这样的服务器函数需要存放在专门的`src/app/lib`中。
+使用原生的 form，button 必须写上`type="submit"`，推荐用 zod 库进行数据校验，因为需要在客户端组件使用交互，所以这样的服务器函数需要存放在专门的`src/app/lib`中。
