@@ -8,7 +8,7 @@
 
   2025.10，苦于总是停留在 ui 框架的使用层面无法提升，决定进行进阶学习，配套有 advance 项目，配和 ts 和 vite 去更全面的了解 react 以及它的底层原理。
 
-- [Next.js](next-base-app/README_OLD.md)
+- [Next.js](next-base-app/README.md)
 
   2025.11，迫于找工作时要求 Next 技术经验的岗位越来越多，决定开始上手 Next 的开发，配套有 base 项目，结合前端最前沿的技术学习 Next 的开发流程。
 
