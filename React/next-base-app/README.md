@@ -9,7 +9,6 @@
 Next.js：开箱即用的静态生产、SSR 服务端渲染和 SEO 优化
 
 - Turbopack：Rust 编写，性能比 webpack 强非常多
-
   - 支持多环境统一，不再需要拆分拼接了
   - 惰性打包：仅打包需要用到的内容
   - 增量计算：多核工作、函数级缓存
@@ -226,3 +225,35 @@ next.config.ts 中配置 `output: 'export'`
 可以在服务器端处理表单的提交，状态的校验管理等。
 
 使用原生的 form，button 必须写上`type="submit"`，推荐用 zod 库进行数据校验，因为需要在客户端组件使用交互，所以这样的服务器函数需要存放在专门的`src/app/lib`中。
+
+## 环境变量
+
+部分配置信息无法硬编码到项目里，防止泄漏，需要通过操作系统命令的方式进行编辑
+
+Linux/macos/wsl：
+
+```Bash
+# 查询环境变量
+echo $PATH
+```
+
+`cross-env`包用来实现跨平台命令
+
+Next.js查找环境变量的顺序：
+
+1. process.env
+2. .env.$(NODE_ENV).local
+3. .env.local
+4. .env.$(NODE_ENV)
+5. .env
+
+> $(NODE_ENV) 开发环境自动注入为`development`，生产模式自动注入`production`
+
+根目录创建了环境变量文件:
+
+- .env.development.local
+- .env.production.local
+
+## 国际化（i18n）
+
+语言+地区：en-US，zh-CN
