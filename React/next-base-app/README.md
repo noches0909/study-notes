@@ -226,7 +226,9 @@ next.config.ts 中配置 `output: 'export'`
 
 使用原生的 form，button 必须写上`type="submit"`，推荐用 zod 库进行数据校验，因为需要在客户端组件使用交互，所以这样的服务器函数需要存放在专门的`src/app/lib`中。
 
-## 环境变量
+## 配置
+
+### 环境变量
 
 部分配置信息无法硬编码到项目里，防止泄漏，需要通过操作系统命令的方式进行编辑
 
@@ -254,6 +256,14 @@ Next.js查找环境变量的顺序：
 - .env.development.local
 - .env.production.local
 
-## 国际化（i18n）
+### 国际化（i18n）
 
 语言+地区：en-US，zh-CN
+
+```zsh
+npm i negotiator # 用于解析Accept-Language
+npm i @formatjs/intl-localematcher # 用于匹配语言
+```
+
+[proxy](./src/proxy.ts)
+[dictionarise](./src/dictionaries/index.ts)
