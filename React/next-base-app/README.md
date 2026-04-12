@@ -267,3 +267,47 @@ npm i @formatjs/intl-localematcher # 用于匹配语言
 
 [proxy](./src/proxy.ts)
 [dictionarise](./src/dictionaries/index.ts)
+
+### 配置文件
+
+`next.config.ts`
+
+不同环境配置不同的东西，需要用`next/constants`:
+
+```ts
+if (phase === PHASE_DEVELOPMENT_SERVER) {
+  // 开发环境
+} else if (phase == PHASE_DEVELOPMENT_BUILD) {
+  // 生产环境
+}
+```
+
+配置端口号需在启动命令中跟上`npm run dev -p 3001`
+
+配置基础路径和重定向：
+
+```ts
+basePath: '/docs',
+redirects() {
+  return [
+    {
+      source: '/', // 源路径
+      destination: 'docs', // 目标路径
+      basePath: false, // 是否使用basePath，默认ture会变成‘/docs/docs’
+      permanent: false, // 是否永久重定向
+    }
+  ]
+}
+```
+
+## CSS解决方案
+
+1. Tailwind CSS（推荐）
+
+2. CSS Modules （React自带）
+
+3. Sass （Next内置）
+
+其他：全局CSS、Style、css-in-js
+
+## SEO（搜索引擎优化）
