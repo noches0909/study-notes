@@ -311,3 +311,9 @@ redirects() {
 其他：全局CSS、Style、css-in-js
 
 ## SEO（搜索引擎优化）
+
+### robots.txt
+
+存放在网站的根目录，告诉爬虫机器人的规则：userAgent、disallow、allow
+
+在Next.js中，可以编写robots.ts，会自动转为txt
