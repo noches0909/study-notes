@@ -1,0 +1,16 @@
+{
+  "name": "base-app",
+  "version": "1.0.0",
+  "description": "Node.js并不是一门编程语言，编程语言是js/ts，他和bun.js一样，是js的运行时。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "jsdom": "^29.0.2"
+  }
+}
