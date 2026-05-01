@@ -194,6 +194,15 @@ nodejs可以通过安装`jsdom`库模拟一个浏览器环境，去进行dom操�
 
   > 可以使用`cross-env`库，来区分开发环境、生产环境，`cross-env`内部会区分不同的操作系统
 
+### util
+
+实用工具和类型的API
+
+```js
+util.format("%s---%s", "start", "end")
+// 输出：start---end
+```
+
 ## 内置模块
 
 ### path
@@ -269,3 +278,33 @@ path.win32.basename("\\foo\\xm.html")
 > 底层exec是通过execFile实现的，而execFile是通过spawn实现的
 
 - fork：spawn的特化版，只能接受js模块，专门开一个node脚本，并且能实现父子进程的通信
+
+### events
+
+核心类：EventEmitter，用于用于发布/订阅事件，事件默认只能支持监听10个，写法类似vue2的event bus。
+
+如今在开发中并不常用，许多内部的API底层用的就是这个模块，且现在更多的使用Promise、WebSocket、消息队列等来进行代替监听事件。
+
+#### FFmpeg
+
+一款开源的跨平台多媒体处理工具
+
+支持格式转换、视频/音频处理、流媒体传输，理效率高且跨平台支持
+
+通关官网下载安装后，示例：
+
+```js
+// 提取视频中的音频
+execSync(‘ffmpeg -i test.mp4 test.mp3, {stdio: 'inherit'})
+
+// 裁剪第10s到第20s
+execSync(‘ffmpeg -ss 10 -to 20 -i test.mp4 test2.mp4, {stdio: 'inherit'})
+```
+
+#### pngquant
+
+一个用于压缩PNG的工具，通关Median Cut 量化算法进行操作的。
+
+### fs
+
+文件系统模块（File System module），提供了与文件系统的交互功能。
