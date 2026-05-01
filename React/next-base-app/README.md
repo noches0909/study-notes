@@ -314,6 +314,52 @@ redirects() {
 
 ### robots.txt
 
-存放在网站的根目录，告诉爬虫机器人的规则：userAgent、disallow、allow
+存放在在网站的根目录，比如：`https://baidu.com/robots.txt`，告诉爬虫机器人的规则：userAgent、disallow、allow
 
-在Next.js中，可以编写robots.ts，会自动转为txt
+在Next.js中，可以在app目录下编写robots.ts，会自动转为txt
+
+### sitemap.xml（网站地图）
+
+在Next.js中，可以在app目录下编写sitemap.ts，会自动转为xml
+
+### TDK + meta
+
+TDK即：title、description、keywords
+
+在Next.js中，在app/layout.tsx中编写，可以动态编写
+
+### JSON-LD
+
+JSON for Linked Data，表达结构化数据的JSON格式，帮助搜索引擎和ai理解页面内容
+
+在Next.js中，在app/layout.tsx或某个具体的page.tsx中编写，输出原生`<scripts type="application/ld+json">`标签来注入
+
+```tsx
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@content": "https://xxx",
+      "@type": "",
+      "@id": "https://xxx",
+      name: "",
+    }),
+  }}
+/>
+```
+
+### Open Graph（OG）
+
+Faceboox（Meta）提出的页面元数据协议。通关`<meta property="og:*">`描述网站，网站链接被分享会生成卡片预览（移动端可以直观的看到）
+
+在Next.js中，通过导出metadata或generateMetadata中的openGraph字段，自动生成对OG标签
+
+### Web Vitals
+
+衡量用户体验的网页性能指标体系。
+
+- LCP：最大内容绘制的时间
+- INP：交互到下一次绘制的延迟
+- CLS：累积布局偏移
+
+建议在页面隐藏的时候在代码里获取这三个值
