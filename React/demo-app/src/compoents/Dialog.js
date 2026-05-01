@@ -1,14 +1,14 @@
-import React, { useState, useImperativeHandle } from "react"
+import React, { useState, useImperativeHandle, useRef } from "react"
 import PropTypes from "prop-types"
 import { Modal } from "antd"
 
-let ok = () => {}
 const DialogCom = ({ btnTxt = ["取消", "确定"], children, cRef, autoClose = true, ...reset }) => {
   const [visible, setVisible] = useState(false)
+  const okRef = useRef(() => {})
 
   const open = (cb) => {
     setVisible(true)
-    ok = cb
+    okRef.current = cb
   }
 
   useImperativeHandle(cRef, () => ({
@@ -21,7 +21,7 @@ const DialogCom = ({ btnTxt = ["取消", "确定"], children, cRef, autoClose = 
 
   const handleOk = () => {
     autoClose && setVisible(false)
-    ok({ name: 123 })
+    okRef.current({ name: 123 })
   }
 
   return (

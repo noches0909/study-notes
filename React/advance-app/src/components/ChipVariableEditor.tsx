@@ -212,6 +212,7 @@ const ChipVariableEditor = ({
   const handlePaste = useCallback((event: ReactClipboardEvent<HTMLDivElement>) => {
     event.preventDefault()
     const text = event.clipboardData.getData('text/plain')
+    // 过时 API 标记：execCommand 已不推荐用于新代码；这里保留为学习示例。
     document.execCommand('insertText', false, text)
   }, [])
 

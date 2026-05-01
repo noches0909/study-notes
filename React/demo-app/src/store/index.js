@@ -35,7 +35,7 @@ const store = configureStore({
     getDefaultMiddleware({
       //关闭redux序列化检测
       serializableCheck: false,
-    }),
+    }).concat(xxxApi.middleware),
 })
 
 // 设置监听器，支持refetchOnFocus和refetchOnReconnect

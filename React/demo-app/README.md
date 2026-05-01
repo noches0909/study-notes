@@ -25,7 +25,9 @@
 3.npx react-scripts start -- 运行
 ```
 
-使用 `create react-app` 创建 React 项目，它会自动在全局安装 React 官方的基于 `webpack` 配置的脚手架 `create-react-app`。
+使用 `create-react-app` 创建 React 项目，它会使用 React 官方基于 `webpack` 配置的脚手架。
+
+> 过时标记：Create React App 已经不再是新项目的首选方案；这里保留为当时学习记录。
 
 React 当前版本 **18.2**
 
@@ -46,7 +48,7 @@ React 当前版本 **18.2**
  *  React元素创建后无法修改，只能通过创建新元素替换
  */
 
-const button = React.creatElement(
+const button = React.createElement(
   "button",
   {
     id: "btn",
@@ -61,16 +63,16 @@ const button = React.creatElement(
 )
 
 // 创建一个以DOM元素为参数的根元素（React元素被插入的位置）
-const root = ReactDOM.createRoot(document.getElememtById("root"))
+const root = ReactDOM.createRoot(document.getElementById("root"))
 
 // 将div渲染进root，render是替换而不是追加
 root.render(button)
 ```
 
-> render 会使页面发生重新渲染，首次调用 render 时会替换所有 DOM 元素，后续调用 React 内部（DOM 差分算法）会进行比较，随后只更新变化的 DOM。_Vue 中的 cpmputed 采用了同样的差分算法_
+> render 会使页面发生重新渲染，首次调用 render 时会替换所有 DOM 元素，后续调用 React 内部（DOM 差分算法）会进行比较，随后只更新变化的 DOM。_Vue 中的 computed 也会做缓存，但和 React DOM diff 不是同一个机制。_
 
-> `ReactDOM.render(button, document.getElememtById("root"))`
-> 老版本（React17 及以下）的使用方式
+> `ReactDOM.render(button, document.getElementById("root"))`
+> 老版本（React17 及以下）的使用方式，React18 起推荐 `createRoot`。
 
 ## 4. JSX
 
@@ -128,7 +130,7 @@ const App = () => {
 }
 
 // root根元素的创建，之后不在赘述
-const root = ReactDOM.createRoot(document.getElememtById("root"))
+const root = ReactDOM.createRoot(document.getElementById("root"))
 
 root.render(<App />)
 ```
@@ -148,7 +150,7 @@ class App extends React.Component {
 
 ### 5.3 `props`
 
-`props` 控制父子组件间的通信，它只读无法修改，子组件想要修改父组件数据也要通过`props`来调用父组件传递过来的回掉函数。
+`props` 控制父子组件间的通信，它只读无法修改，子组件想要修改父组件数据也要通过`props`来调用父组件传递过来的回调函数。
 
 `props.children`：标签体
 `props.className`: 父组件 class
@@ -182,7 +184,7 @@ console.log(this.props.test)
 一个简单的例子：
 
 1. 创建 [App.module.css](./src/App.module.css)
-2. 在组件中引入并以对象属性的方式设置为`ClassName` [App.js](./src/App.js)
+2. 在组件中引入并以对象属性的方式设置为`className` [App.js](./src/App.js)
 
 > _在 Vue 中为 style 提供有 scoped 属性，设置后可以直接在组件中拥有样式的作用域_
 
@@ -200,7 +202,7 @@ const A = () => {
 export default React.memo(A)
 ```
 
-> _Vue 中可以为 template 设置 function 来达成相同的效果_
+> _Vue 中可以通过 `v-memo`、`computed` 等方式做类似的缓存优化，具体机制与 React.memo 不同。_
 
 ## 6. 钩子函数（hook）
 
@@ -214,19 +216,19 @@ export default React.memo(A)
 
 ```js
 // 引入钩子函数来创建state
-import { useState } from "React"
+import { useState } from "react"
 
 // useState的参数可以传入一个初始值，该函数返回一个由初始值和修改方法组成的数组
 const [value, setValue] = useState(1)
 
 // value仅用来显示，不能直接修改，需调用setValue方法传入新值来修改，并会异步重新渲染组件
 setValue(2)
-console.log(value) // 2
+console.log(value) // 当前同步代码里仍可能是旧值
 ```
 
 `setState()`并不会修改旧值，而是重新传入新值。
 
-如果传入的新值用到了旧值，因为是异步渲染的，我们应该使用回掉函数来避免任务队列被抵消的问题。
+如果传入的新值用到了旧值，因为是异步渲染的，我们应该使用回调函数来避免任务队列被抵消的问题。
 
 ```js
 // 将
@@ -243,14 +245,14 @@ state = {
 }
 this.setState((preValue) => {
   return {
-    count: preValue + 1,
+    count: preValue.count + 1,
   }
 })
 ```
 
 #### `setState()`的执行流程
 
-`setState()`调用的 ReactDom 的底层方法`dispatchSetDate()`，该方法会先判断组件处于的阶段。
+`setState()`调用 React DOM 的底层更新调度逻辑，该逻辑会先判断组件所处的阶段。
 
 - 在渲染阶段并不会检查`state`的值是否相同。
 - 其他阶段才会检查，不同则会重新渲染，有时相同也会重新渲染（第一次用相同值调用时）。
@@ -277,7 +279,7 @@ const [count, countDispatch] = useReducer((state, acticon) => {
 
 ```js
 // 引入钩子函数
-import { useRef } from "React"
+import { useRef } from "react"
 
 // 创建一个存储DOM对象的容器，会匹配标有ref属性h1Ref值的元素
 const h1Ref = useRef()
@@ -293,10 +295,10 @@ const App = () => {
 
 `useRef()`创建的对象，可以确保每次渲染获取到的都是同一个对象
 
-在类组件中使用`creatRef()`
+在类组件中使用`createRef()`
 
 ```js
-divRef = React.creatRef()
+divRef = React.createRef()
 console.log(this.divRef.current)
 ```
 
@@ -330,7 +332,7 @@ const Home = React.forwardRef((props, ref) => {
   const inputRef = useRef()
 
   useImperativeHandle(ref, () => {
-    // 回掉函数的返回值会变成ref的值
+    // 回调函数的返回值会变成ref的值
     return {
       changeInput(val) {
         inputRef.current.value = val
@@ -473,7 +475,7 @@ startTransition(() => {
 解决组件会默认作为父组件的后代渲染到页面上的一种方案，`portal`可以指定组件渲染的位置
 
 ```js
-import ReactDom from "react-dom"
+import ReactDOM from "react-dom"
 
 // 在需要被渲染的元素处添加标识，如id="box"
 const App = () => {
@@ -485,7 +487,7 @@ const box = document.getElementById("box")
 
 // 使用portal将当前组件传递到box元素中
 const myComp = (props) => {
-  return ReactDom.createPortal(<div className="comp">{props.children}</div>, box)
+  return ReactDOM.createPortal(<div className="comp">{props.children}</div>, box)
 }
 
 export default myComp
@@ -499,7 +501,7 @@ Context 通常都放在一个 store 文件中。
 
 ```js
 // 新建一个TestContext.js文件
-import React from "reaxt"
+import React from "react"
 
 const TestContext = React.createContext({
   name: "姓名",
@@ -595,7 +597,7 @@ const { data, loading } = useTest({
 
 ## 10. Redux
 
-Redux 时一个专为 JS 应用设计的可预期的状态管理器，并不专属于 React。`useState`只能在当前组件定义和管理`state`，Context 也只能进行简单的跨组件通信，而 Redux 可以进行全局通信，功能更全面，能适应更复杂的需求。
+Redux 是一个专为 JS 应用设计的可预期的状态管理器，并不专属于 React。`useState`只能在当前组件定义和管理`state`，Context 也只能进行简单的跨组件通信，而 Redux 可以进行全局通信，功能更全面，能适应更复杂的需求。
 
 使用 Redux 来管理`state`，外部无法直接修改`state`，只能通过 Redux 提供的方法来操作。
 
@@ -613,7 +615,7 @@ store.subscribe(() => {
   console.log(store.getState())
 })
 
-// 派发，事件处罚时执行store提供的方法
+// 派发，事件触发时执行store提供的方法
 store.dispatch(1)
 ```
 
@@ -669,7 +671,7 @@ import { useGetXxxQuery, useDelXxxMutation } from "./store/indexApi.js"
 const result = useGetXxxQuery(null, {
   // 传对象为第二参数，可以进行请求的配置
   selectFromResult: (res) => res, // 指定返回结果
-  pollingInterval: 0, //设置轮询间隔，单位毫米，默认0不轮询
+  pollingInterval: 0, //设置轮询间隔，单位毫秒，默认0不轮询
   skip: false, // 是否跳过请求，默认否
   refetchOnMountOrArgChange: false, // 是否每次都重新加载数据，默认false正常使用缓存，也可以指定数字缓存时间（秒）
   refetchOnFocus: false, // 是否重新获取焦点时加载数据
@@ -685,11 +687,11 @@ const { data, isSuccess, isFetching, refetch } = result
 
 实际体验下来感觉可以定义的非常细致，但这种封装还是烦琐了许多。
 
-## 11. React-ruoter
+## 11. React-router
 
-现代化 JS 框架通常都是单页应用（SPA），它们实际上只有一个页面，且只会进行浏览器的首页加载，但随着项目复杂度的提升，我们必然是需要多页面来承载更多的细化页面的，因此对于 React 而言，React-ruoter 就诞生了。
+现代化 JS 框架通常都是单页应用（SPA），它们实际上只有一个页面，且只会进行浏览器的首页加载，但随着项目复杂度的提升，我们必然是需要多页面来承载更多的细化页面的，因此对于 React 而言，React-router 就诞生了。
 
-React-ruoter 能将 React 组件和浏览器 URL 地址映射起来，地址的变化不由服务器处理，而是由客户端处理。
+React-router 能将 React 组件和浏览器 URL 地址映射起来，地址的变化不由服务器处理，而是由客户端处理。
 
 > _Vue 也有 Vue-router 这样的工具_。
 
@@ -724,6 +726,8 @@ location / {
 
 ### Route V5
 
+> 过时标记：本节是 React Router v5 写法，当前项目安装的是 v6，实际开发优先看下面的 Route V6。
+
 在页面上的应用：
 
 - 使用`Route`指定路由组件
@@ -742,14 +746,14 @@ function App(props) {
        * component: 挂载组件
        */}
       <Route exact path="/" component={Home} />
-      {/* render方式可以传递回掉函数，来自由定义传参routeProps{match、location、history} */}
+      {/* render方式可以传递回调函数，来自由定义传参routeProps{match、location、history} */}
       <Route
         path="/"
         render={(routeProps) => {
           return <Home />
         }}
       />
-      {/* children方式与render类似，但它设置了回掉函数后必定被挂载，否则会报错 */}
+      {/* children方式与render类似，但它设置了回调函数后必定被挂载，否则会报错 */}
       <Route
         path="/"
         children={(routeProps) => {
@@ -773,8 +777,8 @@ import { Link, NavLink, useRouteMatch, useLocation, useHistory, useParams } from
 const Home = (props) => {
   // component方式可以通过props获取路由信息
   const clickHandler = () => {
-    // porps.history 主动调用跳转
-    props.history.push({ pathName: "/", state: { name: "" } })
+    // props.history 主动调用跳转
+    props.history.push({ pathname: "/", state: { name: "" } })
   }
 
   // 函数方式可以通过钩子函数获取路由信息
@@ -796,11 +800,11 @@ const Home = (props) => {
 
 相比于 V5 的变化：
 
-1. 必须用`Routs`组件包裹`Route`组件
+1. 必须用`Routes`组件包裹`Route`组件
 2. `Route`上的`component、render、children`被`element`取代
 3. 钩子函数去除`useRouteMatch、useHistory`，新增`useMatch、useNavigate`
-4. 添加`OutLet`组件以支持嵌套路由
-5. `NavLink`组件的`activeClassName、activeStyle`属性支持回调函数
+4. 添加`Outlet`组件以支持嵌套路由
+5. `NavLink`组件的`className、style`属性支持回调函数
 
 ```js
 import { Routes, Route } from "react-router-dom"
@@ -822,7 +826,7 @@ const App = () => {
 ```
 
 ```js
-import { Navigate, OutLet, useMatch, useNavigate } from "react-router-dom"
+import { Navigate, Outlet, useMatch, useNavigate } from "react-router-dom"
 
 // 检查当前路由地址和'/'是否匹配，匹配则返回当前路由，否则返回null
 const match = useMatch("/")
@@ -837,8 +841,8 @@ const Home = () => {
     <div>
       {/* Navigate组件默认push跳转 */}
       <Navigate to="/" replace />
-      {/* OutLet显示嵌套路由中匹配的路由组件 */}
-      <OutLet />
+      {/* Outlet显示嵌套路由中匹配的路由组件 */}
+      <Outlet />
     </div>
   )
 }

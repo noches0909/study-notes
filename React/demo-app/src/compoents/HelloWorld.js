@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from "react"
-import { Button, Modal, theme, Transfer, Tree } from "antd"
+import React, { useState, useRef } from "react"
+import { Button, theme, Transfer, Tree } from "antd"
 import Dialog from "./Dialog"
 // Customize Table Transfer
 const isChecked = (selectedKeys, eventKey) => selectedKeys.includes(eventKey)
@@ -35,65 +35,73 @@ const TreeTransfer = ({ dataSource, targetKeys = [], ...restProps }) => {
   }
 
   const [stateArr, setStateArr] = useState([])
+  const [editingItem, setEditingItem] = useState(null)
   const open = (item) => {
+    setEditingItem(item)
     childRef.current.open((values) => {
-      item.title = values.name
-      setStateArr([...stateArr, { ...item }])
-      console.log(stateArr)
+      setStateArr((prevStateArr) => {
+        const nextItem = { ...item, title: values.name }
+        const hasItem = prevStateArr.some((val) => val.key === item.key)
+        return hasItem
+          ? prevStateArr.map((val) => (val.key === item.key ? nextItem : val))
+          : [...prevStateArr, nextItem]
+      })
     })
   }
 
   return (
-    <Transfer
-      {...restProps}
-      targetKeys={targetKeys}
-      dataSource={transferDataSource}
-      className="tree-transfer"
-      render={(item) => (
-        <>
-          <div key={Math.random}>
-            {stateArr.some((val) => val.key === item.key)
-              ? stateArr.find((val) => val.key === item.key).title
-              : item.title}
-          </div>
-          <Button type="text" onClick={() => open({ ...item })}>
-            编辑
-          </Button>
-          <Dialog {...config} cRef={childRef}>
-            <p>{item.title}</p>
-          </Dialog>
-        </>
-      )}
-      showSelectAll={false}
-    >
-      {({ direction, onItemSelect, selectedKeys }) => {
-        if (direction === "left") {
-          const checkedKeys = [...selectedKeys, ...targetKeys]
+    <>
+      <Transfer
+        {...restProps}
+        targetKeys={targetKeys}
+        dataSource={transferDataSource}
+        className="tree-transfer"
+        render={(item) => {
+          const editedItem = stateArr.find((val) => val.key === item.key)
           return (
-            <div
-              style={{
-                padding: token.paddingXS,
-              }}
-            >
-              <Tree
-                blockNode
-                checkable
-                checkStrictly
-                defaultExpandAll
-                checkedKeys={checkedKeys}
-                treeData={generateTree(dataSource, targetKeys)}
-                onCheck={(_, { node: { key } }) => {
-                  onItemSelect(key, !isChecked(checkedKeys, key))
-                }}
-                onSelect={(_, { node: { key } }) => {
-                  onItemSelect(key, !isChecked(checkedKeys, key))
-                }}
-              />
-            </div>
+            <>
+              <div>{editedItem ? editedItem.title : item.title}</div>
+              <Button type="text" onClick={() => open({ ...item })}>
+                编辑
+              </Button>
+            </>
           )
-        }
-      }}
-    </Transfer>
+        }}
+        showSelectAll={false}
+      >
+        {({ direction, onItemSelect, selectedKeys }) => {
+          if (direction === "left") {
+            const checkedKeys = [...selectedKeys, ...targetKeys]
+            return (
+              <div
+                style={{
+                  padding: token.paddingXS,
+                }}
+              >
+                <Tree
+                  blockNode
+                  checkable
+                  checkStrictly
+                  defaultExpandAll
+                  checkedKeys={checkedKeys}
+                  treeData={generateTree(dataSource, targetKeys)}
+                  onCheck={(_, { node: { key } }) => {
+                    onItemSelect(key, !isChecked(checkedKeys, key))
+                  }}
+                  onSelect={(_, { node: { key } }) => {
+                    onItemSelect(key, !isChecked(checkedKeys, key))
+                  }}
+                />
+              </div>
+            )
+          }
+          return null
+        }}
+      </Transfer>
+      <Dialog {...config} cRef={childRef}>
+        <p>{editingItem?.title}</p>
+      </Dialog>
+    </>
   )
 }
 const treeData = [

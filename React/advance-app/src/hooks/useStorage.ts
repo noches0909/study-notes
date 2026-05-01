@@ -3,9 +3,12 @@
  * 它提供了一个状态值和一个更新该值的函数，并确保在本地存储中同步数据。
  */
 
-import { useSyncExternalStore } from "react"
+import { useRef, useSyncExternalStore } from "react"
 
 export const useStorage = <T>(key: string, initialValue: T) => {
+  const lastRawValueRef = useRef<string | null>(null)
+  const lastSnapshotRef = useRef<T>(initialValue)
+
   // 订阅者
   const subscribe = (onStorageChange: () => void) => {
     // 监听浏览器原生提供的storage 事件，当本地存储发生变化时触发回调
@@ -17,7 +20,12 @@ export const useStorage = <T>(key: string, initialValue: T) => {
 
   // 获取当前快照
   const getSnapshot = () => {
-    return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)!) : initialValue
+    const rawValue = localStorage.getItem(key)
+    if (rawValue === lastRawValueRef.current) return lastSnapshotRef.current
+
+    lastRawValueRef.current = rawValue
+    lastSnapshotRef.current = rawValue ? JSON.parse(rawValue) : initialValue
+    return lastSnapshotRef.current
   }
 
   const res = useSyncExternalStore(subscribe, getSnapshot)

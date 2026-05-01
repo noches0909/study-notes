@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback } from "react"
 
 function Demo() {
   const { isHover, handleMouseEnter, handleMouseLeave } = useHover(false)
@@ -21,14 +21,6 @@ function useHover(bol) {
   const handleMouseLeave = useCallback(() => {
     setIsHover(false)
   }, [])
-
-  useEffect(() => {
-    return () => {
-      // 组件卸载时取消事件监听
-      document.removeEventListener("mouseenter", handleMouseEnter)
-      document.removeEventListener("mouseleave", handleMouseLeave)
-    }
-  }, [handleMouseEnter, handleMouseLeave])
 
   return {
     isHover,

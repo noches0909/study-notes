@@ -6,9 +6,8 @@ const xxxApi = createApi({
   // 指定基础请求信息，默认fetch
   baseQuery: fetchBaseQuery({
     baseUrl: "http://xxx/",
-    prepareHeaders: (headers, { getState }) => {
+    prepareHeaders: (headers) => {
       // 统一设置请求头
-      console.log(getState()) // 获取state
       headers.set("Authorization", "token123123")
       return headers
     },

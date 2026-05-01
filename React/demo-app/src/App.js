@@ -1,6 +1,4 @@
-import logo from "./logo.svg"
 import "./App.css"
-import classes from "./App.module.css"
 import HelloWorld from "./compoents/HelloWorld"
 import Demo from "./compoents/Demo"
 

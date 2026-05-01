@@ -23,7 +23,7 @@ function App() {
       <div
         className={`aa bb cc`}
         dangerouslySetInnerHTML={{ __html: html }}
-        onclick={(e) => fn(123)}
+        onClick={(e) => fn(123)}
       ></div>
     </>
   )
@@ -92,7 +92,7 @@ const [state, setState] = useState("hello")
 
 初始化 useState 可以传函数（必须带有 return），且只会执行一次
 
-setState 设计为了异步渲染，为了性能优化，多个重复性的 setState 在队列中会进行后续阻断，可以理解为自带防抖，最后才会 render，可以通过传入回掉函数以更新的方式来解决异步渲染
+setState 设计为了异步渲染，为了性能优化，多个 setState 会被 React 批处理后再 render；如果依赖上一次 state，可以通过传入回调函数的方式更新。
 
 ### 4.2 useReducer
 
@@ -130,7 +130,7 @@ const res = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
 getSnapshot 的返回值，如果不是上一次的的引用类型，那么 React 会重新渲染，如果总是不一样，那么就会陷入死循环。
 
-### 4.5 useTransititon（优先级不高）
+### 4.5 useTransition（优先级不高）
 
 在实际工作中使用较少，管理 UI 的过渡状态，不阻塞 UI 的情况下更新状态，原理其实就是降低优先级，可用于列表的渲染优化。
 
@@ -141,7 +141,7 @@ const [isPending, startTransition] = useTransition()
 
 ### 4.6 useDeferredValue
 
-延迟某些状态的更新，相比于 useTransititon 所关注的状态过渡，useDeferredValue 更关注单个值的延迟更新，可用于比如输入框的性能优化。
+延迟某些状态的更新，相比于 useTransition 所关注的状态过渡，useDeferredValue 更关注单个值的延迟更新，可用于比如输入框的性能优化。
 
 ```tsx
 const deferredValue = useDeferredValue(value)
@@ -156,7 +156,7 @@ const deferredValue = useDeferredValue(value)
 
 ```tsx
 // setup: 处理函数，页面挂载完成后执行，可以return一个清理函数cleanup，页面卸载后执行
-// 依赖项要更新时，更新前执行cleanup，更新后执行setup，即防抖
+// 依赖项要更新时，更新前执行cleanup，更新后执行setup
 useEffect(setup, dependencies)
 // dependencies可选，数组
 // 不传，任何状态改变都会执行
@@ -218,7 +218,7 @@ useMemo：缓存上一次计算的值，类似 vue 的 computed
 
 > 父组件触发重新渲染后，即使 props 没变，但会导致传给子组件的函数内存地址不一致了，从而会触发子组件的重新渲染
 
-### 4.14 usedebugValue
+### 4.14 useDebugValue
 
 用来调试自定义 Hook
 
@@ -244,15 +244,14 @@ props.children 里包含“插槽”
 
 ```tsx
 // 发布方
-const e = new.event("on-test")
 const handleTap = () => {
-  e.params = { name: "参数" }
+  const e = new CustomEvent("on-test", { detail: { name: "参数" } })
   window.dispatchEvent(e)
 }
 
 // 接受方
 window.addEventListener("on-test", (e) => {
-  console.log(e.params)
+  console.log(e.detail)
 })
 ```
 
@@ -287,19 +286,19 @@ const App = () => {
 
 不常用，可以理解为二次封装组件，通常出现在类组件中，with 开头的命名
 
-## 6 createProtal
+## 6 createPortal
 
-将一个组件渲染到指定 DOM 的位置，弹窗、遮罩、模态框等，类似 vue 的 Teleportl
+将一个组件渲染到指定 DOM 的位置，弹窗、遮罩、模态框等，类似 vue 的 Teleport
 
 ```tsx
-import { createProtal } from "react-dom"
+import { createPortal } from "react-dom"
 
 const App = () => {
   // children：要渲染的组件
   // domNode：渲染的制定DOM位置
   // key可选：唯一标识
   // return一个jsx
-  return createProtal(<div>test</div>, document.body)
+  return createPortal(<div>test</div>, document.body)
 }
 ```
 
@@ -351,7 +350,7 @@ V7 版本不需要再安装 react-router-dom 库，已经合并到 react-router 
 
 ### 9 状态管理 Zustand
 
-Redux 太老太繁琐了，Zustand 十分轻量（1kb），简单上手无需组件包裹，易于集成适配 vue，强扩展性（中间件）且无副作用
+Redux 相对繁琐，Zustand 十分轻量，简单上手无需组件包裹，易于集成适配 vue，强扩展性（中间件）且无副作用
 
 [一个快速上手的例子](./store/price.ts)
 
@@ -372,7 +371,7 @@ Redux 太老太繁琐了，Zustand 十分轻量（1kb），简单上手无需组
 
 #### 9.2 useShallow
 
-可以通过解构的方式获取状态，并且不会造成额外的渲染
+可以通过解构的方式获取状态，并使用浅比较减少不必要的渲染
 
 ```tsx
 const { test1, test2 } = useTestStore(
@@ -385,7 +384,7 @@ const { test1, test2 } = useTestStore(
 
 #### 9.3 订阅 subscribe
 
-为了解决我们只想通过修改某个状态来简单的获取信息，但却造成了大量组件的重复渲染问题，可以配合 subscribeWithSelector 中间价使用
+为了解决我们只想通过修改某个状态来简单地获取信息，但却造成了大量组件的重复渲染问题，可以配合 subscribeWithSelector 中间件使用
 
 可以理解为 vue 中的 watch
 
