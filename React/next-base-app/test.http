@@ -7,3 +7,37 @@ Content-Type: application/json
   "id": 3,
   "name": 5
 }
+
+
+### 创建用户
+POST http://localhost:3000/api
+Content-Type: application/json
+
+{
+    "name": "test",
+    "email": "1test@test.com",
+    "password": "123456"
+}
+
+### 查询所有用户
+GET http://localhost:3000/api
+
+
+### 更新用户
+PUT http://localhost:3000/api
+Content-Type: application/json
+
+{
+    "id": "cmkyoxflr00004ck82ywc6joi",
+    "name": "xiaoman",
+    "email": "xiaomansdasdas",
+    "password": "dasdasda"
+}
+
+### 删除用户
+DELETE http://localhost:3000/api
+Content-Type: application/json
+
+{
+    "id": "04e5a965-4203-49a6-80db-46561cf15950"
+}

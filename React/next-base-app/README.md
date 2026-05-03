@@ -363,3 +363,36 @@ Faceboox（Meta）提出的页面元数据协议。通关`<meta property="og:*">
 - CLS：累积布局偏移
 
 建议在页面隐藏的时候在代码里获取这三个值
+
+## ORM
+
+orm框架可以支持我们不用写sql的情况下写入数据库，这里使用Prisma配合Postgresql数据库（开源免费），推荐用docker进行安装。
+
+### 初始化
+
+```zsh
+# 安装prisma
+bun i prisma -D
+
+# 安装prisma客户端和pg的适配器
+bun install @prisma/client @prisma/adapter-pg pg dotenv
+
+# 初始化
+bunx prisma init
+```
+
+- 在[prisma](./prisma/schema.prisma)中编写数据库表
+
+- 在`.env`中编写环境变量
+
+- 执行数据库迁移：`bunx prisma migrate dev --name init`
+
+- 代码中生成客户端文件：`bunx prisma generate`
+
+### 增删改查
+
+编写[prisma](./src/lib/prisma.ts)，引入生成的客户端文件，导出客户端实例
+
+编写[接口](./src/app/api/route.ts)，增删改查接口定义
+
+编写测试[调用](./test.http)，模拟数据库操作
