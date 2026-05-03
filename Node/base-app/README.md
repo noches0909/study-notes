@@ -308,3 +308,85 @@ execSync(‘ffmpeg -ss 10 -to 20 -i test.mp4 test2.mp4, {stdio: 'inherit'})
 ### fs
 
 文件系统模块（File System module），提供了与文件系统的交互功能。
+
+三种策略：异步、同步、promise
+
+- readFile：读取文件
+
+- createReadStream：读取大文件流
+
+- mkdirSync：创建文件夹，recursive：递归
+
+- rm：删除，recursive：递归
+
+- renameSync：重命名
+
+- watch：监听文件的变化
+
+```js
+fs.readFile(
+  "./index.txt",
+  {
+    encoding: "utf-8",
+    flag: "r",
+  },
+  (err) => {
+    if (err) throw err
+    console.log("fs")
+  },
+)
+
+setImmediate(() => {
+  console.log("setImmediate")
+})
+
+// 打印结果是先setImmediate，再fs
+
+// fs.readFile的回调是 Node/libuv 的 I/O 回调，属于事件循环里的 I/O callback，通常在 poll 阶段执行。
+// setImmediate 是 Node 提供的 API，由 libuv 事件循环调度，回调在 check 阶段执行。
+// 由于 readFile 的 I/O 通常还没在第一轮事件循环中完成，所以 setImmediate 往往先执行
+
+// timers
+// pending callbacks
+// idle/prepare
+// poll        // I/O 回调通常在这里
+// check       // setImmediate 在这里
+// close callbacks
+```
+
+- writeFileSync：写入文件
+
+```js
+fs.writeFileSync("./index.txt", "123", {
+  // 不加a则是替换，加a是追加
+  flag: "a", // append
+})
+```
+
+- appendFileSynce：追加文件写入
+
+- createWriteStream：大文件流写入
+
+```js
+const writeStream = fs.createWriteStream("./index.txt")
+
+;[("1", "2")].forEach((item) => {
+  writeStream.write(item + "\n")
+})
+
+writeStream.end()
+```
+
+- linkSync：硬链接
+
+- symlinkSync：软链接/符合链接
+
+```js
+// 原始地址，链接后的地址
+fs.linkSync("./index.txt", "./index2.txt")
+fs.symlinkSync("./index.txt", "./index3.txt")
+
+// 硬链接更像复制粘贴，软链接更像快捷方式
+```
+
+> pnpm的底层就是用的硬链接和软链接来实现依赖的共享
