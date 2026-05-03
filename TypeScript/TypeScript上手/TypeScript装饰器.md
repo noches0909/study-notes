@@ -1,152 +1,124 @@
 # TypeScript 装饰器
 
-本质上还是函数，用来拓展简洁我们的语法。
+> 过时提醒：TypeScript 5.0 起支持符合 ECMAScript 新提案语义的标准装饰器；旧版 `experimentalDecorators` 属于 legacy decorators，两者签名和元数据能力不同。学习时要先确认项目使用的是哪一种。
 
-## 类装饰器
+## 定位
 
-```ts
-/*
- * 定义类的类型
- * new 表示可以被new调用
- * ...args表示可以传任意数量的参数
- * any[]标识可以传任意类型的参数
- * {}标识返回的对象不是null或undefined
- */
+装饰器本质是函数，用来在不直接改写类声明主体的情况下，为类、方法、字段等位置附加逻辑。
 
-// 简易写法
-// type Constructor = new (...args: any[]) => {}
+常见用途：
 
-// 高级写法 (多了个静态属性)
-type Constructor = {
-  new (...args: any[]): {}
-  wife: sting
-}
+- 框架元数据，如依赖注入、路由、ORM 字段。
+- 日志、埋点、权限校验等横切逻辑。
+- 对类或方法进行包装。
 
-interface Person {
-  getTime(): void
-}
-
-// 装饰器（泛型约束，传入的类型必须是可以用new关键字调用的类）
-function Demo<T extends Constructor>(target: T) {
-  // 封锁参数，似的外部无法进行person.prototype的修改操作
-  Object.seal(target.prototype)
-
-  // this即是我们传入的类的实例
-  console.log(this.name)
-
-  // 返回一个继承自传入类的新类
-  return class extends target {
-    createTime: Date
-    constructor(...args: any[]) {
-      super(...args)
-      this.createTime = new Date()
-    }
-    getTime() {
-      return this.createTime
-    }
-  }
-}
-
-@Demo
-class Person {
-  static wife: string
-  constructor(public name: string, public age: number) {}
-  speak() {
-    console.log("123")
-  }
-}
-
-const p1 = new Person("张三", 18)
-console.log(p1.getTime())
-```
-
-## 装饰器工厂
-
-返回装饰器的函数，为装饰器添加函数，更灵活的控制装饰器。
+## 新版类装饰器
 
 ```ts
-function Demo(n: number) {
-  return function (target: Function) {
-    console.log(n, this.name)
+type Constructor<T = object> = new (...args: any[]) => T
+
+function WithCreatedAt<T extends Constructor>(Target: T) {
+  return class extends Target {
+    createdAt = new Date()
   }
 }
 
-@Demo(2)
+@WithCreatedAt
 class Person {
   constructor(public name: string) {}
 }
 ```
 
-## 装饰器组合
+类装饰器可以返回一个新类，用来替换原类。
 
-先工厂由上到下执行，后装饰器由下到上执行
+## 装饰器工厂
 
-## 属性/方法装饰器
+装饰器工厂是返回装饰器的函数，用于传入配置。
 
 ```ts
-/**
- * 属性装饰器
- * target：对于静态属性，它是类，对于实例属性，他是类的原型对象
- * propertyKey：属性名
- */
-
-// 监视属性的修改
-function State(target: object, propertyKey: string) {
-  // 根据不同的propertyKey做了缓存
-  let key = `__${propertyKey}`
-  Object.defineProperty(target, propertyKey, {
-    get() {
-      return this[key]
-    },
-    set(newValue) {
-      console.log(propertyKey, newValue)
-      this[key] = newValue
-    },
-    enumerable: true, // 可枚举
-    configrable: true, // 可配置
-  })
+function LogName(prefix: string) {
+  return function <T extends new (...args: any[]) => object>(Target: T) {
+    return class extends Target {
+      constructor(...args: any[]) {
+        super(...args)
+        console.log(prefix, Target.name)
+      }
+    }
+  }
 }
 
-/**
- * 方法装饰器
- * target：对于静态方法，它是类，对于实例方法，他是类的原型对象
- * propertyKey：方法名
- * descriptor：方法的描述对象 writable，value等
- */
+@LogName("init")
+class Service {}
+```
 
-function Logger(target: object, propertyKey: string, descriptor: PropertyDescriptor) {
-  // 缓存原始方法
-  const originnal = descriptor.value
-  // 替换原始方法
-  descriptor.value = function (...args: any[]) {
-    console.log("开始")
-    // original.apply(this, args)
-    const result = originnal.call(this, ...args)
-    console.log("结束")
+## 方法装饰器
+
+新版方法装饰器接收原方法和上下文对象，返回的新函数会替换原方法。
+
+```ts
+function Logger<This, Args extends unknown[], Return>(
+  original: (this: This, ...args: Args) => Return,
+  context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Return>,
+) {
+  return function (this: This, ...args: Args): Return {
+    console.log("start", String(context.name))
+    const result = original.call(this, ...args)
+    console.log("end", String(context.name))
+    return result
   }
 }
 
 class Person {
-  name: string
-  @State age: string
-  constructor(name: string, age: string) {
-    this.name = name
-    this.age = age
+  @Logger
+  speak(message: string) {
+    console.log(message)
   }
-  @Logger speak() {
-    console.log(1)
+}
+```
+
+## 字段装饰器
+
+字段装饰器可以返回初始化函数，对字段初始值做处理。
+
+```ts
+function Trim(_: undefined, context: ClassFieldDecoratorContext) {
+  return function (initialValue: string) {
+    console.log("init", String(context.name))
+    return initialValue.trim()
   }
 }
 
-const p1 = new Person("张三", 18)
-const p2 = new Person("张四", 28)
-p1.speak()
+class User {
+  @Trim
+  name = " Tom "
+}
 ```
 
-## 访问器装饰器
+## 执行顺序
 
-装饰 get、set 这样的访问器
+装饰器表达式会先从上到下求值，真正调用装饰器时通常按位置和语义应用。多个装饰器叠加时，靠近被装饰成员的装饰器更早包住原始值。
 
-## 参数装饰器
+```ts
+function A(value: unknown) {
+  console.log("A")
+  return value
+}
 
-装饰方法里面的参数
+function B(value: unknown) {
+  console.log("B")
+  return value
+}
+
+class Demo {
+  @A
+  @B
+  method() {}
+}
+```
+
+## 使用建议
+
+- 普通业务逻辑优先用函数组合，装饰器适合框架化、横切逻辑。
+- 不要把大量隐式行为藏进装饰器，否则调试成本会升高。
+- 老项目看到 `target`、`propertyKey`、`descriptor` 三参数写法，多半是 legacy decorators。
+- 新项目需要确认 `tsconfig.json`、构建器和框架是否支持新版装饰器语义。

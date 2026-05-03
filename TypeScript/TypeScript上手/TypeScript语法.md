@@ -1,137 +1,186 @@
 # TypeScript 语法
 
-## 属性修饰符
+## 类成员修饰符
 
-- public **公开** *类内部、子类、类外部*可访问
-- protected **受保护** *类内部、子类*可访问
-- private **私有** *类内部*可访问
-
-readonly **只读** 无法修改，加在前三类后面
+- `public`：公开，类内部、子类、类外部都可访问，默认值。
+- `protected`：受保护，类内部和子类可访问。
+- `private`：私有，仅类内部可访问，属于 TypeScript 类型层面的私有。
+- `readonly`：只读，只能在声明或构造阶段赋值。
 
 ```ts
 class Person {
-  public name: string
-  public age: string
-  constructor(name: string, age: string) {
-    this.name = name
-    this.age = age
-  }
+  constructor(
+    public name: string,
+    protected age: number,
+    private id: string,
+    public readonly createdAt = new Date(),
+  ) {}
 }
+```
 
-// 简写
-class Person {
-  constructor(public name: string, public age: string) {}
+如果需要 JavaScript 运行时私有字段，可以使用 `#field`：
+
+```ts
+class Counter {
+  #value = 0
+
+  inc() {
+    this.#value += 1
+  }
 }
 ```
 
 ## 抽象类
 
-**abstract**
-
-只能被继承，不能被实现，抽象类中既可以有普通方法，也可以有抽象方法，**派生类必须实现它的抽象方法**
-
-- 定义通用方法
-- 提供基础实现
-- 确保关键实现
-- 共享代码逻辑
-
-## 接口
-
-**interface**
-
-定义结构和格式，确保代码一致性，不能包含实现。
-
-- 接口可以继承接口。
-- 接口重复定义会自动合并。
+抽象类只能被继承，不能直接实例化。它可以包含普通实现，也可以声明必须由子类实现的抽象成员。
 
 ```ts
-interface test {
-  name: string
-  speak(n: string): void
-}
-
-// 类（implements：实现）
-// implements test,test2 这样写可以实现多个接口
-class TestClass implements test {
+abstract class Store {
   constructor(public name: string) {}
-  speak(n: string): void {
-    console.log(this.name, n)
+
+  connect() {
+    console.log(`${this.name} connected`)
   }
+
+  abstract read(key: string): unknown
 }
 
-// 对象
-const testObj: test = {
-  name: "我",
-  speak(n) {
-    console.log(n)
-  },
-}
+class MemoryStore extends Store {
+  private data = new Map<string, unknown>()
 
-// 函数
-interface test2 {
-  (a: number, b: number): number
-}
-
-const testFn = (x, y) => {
-  return x + y
+  read(key: string) {
+    return this.data.get(key)
+  }
 }
 ```
 
-### interface 和 type
+适合表达“有一部分通用实现，但关键能力必须由子类补齐”的场景。
 
-都支持定义对象的结构
+## 接口
 
-- interface 更专注对象和类，支持继承和合并。
-- type 支持类型别名、交叉类型、联合类型，不能继承和合并。
+接口用于描述对象、函数或类的结构。
 
-### interface 和 抽象类
+```ts
+interface User {
+  id: string
+  name: string
+  age?: number
+}
 
-都支持定义类的结构
+const user: User = {
+  id: "1",
+  name: "Tom",
+}
+```
 
-- interface 只能描述结构，不能有实现，一个类可以实现多个接口。
-- 抽象类 既可以有抽象的方法，也可以有具体的实现，一个类只能继承一个抽象类。
+接口描述函数：
+
+```ts
+interface Add {
+  (a: number, b: number): number
+}
+
+const add: Add = (a, b) => a + b
+```
+
+接口约束类：
+
+```ts
+interface Speaker {
+  speak(message: string): void
+}
+
+class Person implements Speaker {
+  speak(message: string) {
+    console.log(message)
+  }
+}
+```
+
+## interface 和 type
+
+都可以描述对象结构：
+
+```ts
+interface UserA {
+  name: string
+}
+
+type UserB = {
+  name: string
+}
+```
+
+区别：
+
+- `interface` 更适合对象和类，支持 `extends` 和声明合并。
+- `type` 更适合联合、交叉、条件类型、映射类型等组合表达。
+- 能用清楚的情况下保持一致即可，不必机械二选一。
+
+## interface 和抽象类
+
+- `interface` 只描述结构，不包含运行时实现，一个类可以实现多个接口。
+- 抽象类可以包含实现，一个类只能继承一个父类。
 
 ## 泛型
 
-定义函数、类和接口时，用类型参数来表示未指定的类型，使用时才知道具体的类型，安全的保证同一段代码适应多种类型。
+泛型是在定义函数、类、接口时预留类型参数，使用时再确定具体类型。
 
 ```ts
-// 泛型函数
-const log = <T, U>(data1: T, data2: U): T | U => {
-  return data1 % 2 ? data1 : data2
+function identity<T>(value: T): T {
+  return value
 }
 
-log<number, string>(1, "1")
-log<number, boolean>(1, true)
+identity<string>("hello")
+identity(123)
+```
 
-// 泛型接口
-interface test<T> {
-  name: string
-  info: T
+多个泛型参数：
+
+```ts
+function pair<T, U>(first: T, second: U): [T, U] {
+  return [first, second]
 }
+```
 
-type infoType = {
-  title: string
+泛型约束：
+
+```ts
+function getLength<T extends { length: number }>(value: T): number {
+  return value.length
 }
+```
 
-let p: test<infoType> = {
-  name: "123",
-  info: {
-    title: "123",
-  },
+泛型接口：
+
+```ts
+interface ApiResponse<T> {
+  code: number
+  data: T
+  message: string
 }
+```
 
-// 泛型类
-class Test2<T> {
-  constructor(public name: string, public info: T) {}
-  speak() {
-    console.log(this.name, this.info)
-  }
+泛型类：
+
+```ts
+class Box<T> {
+  constructor(public value: T) {}
 }
-
-const p2 = new Test2<infoType>("123", { title: "123" })
 ```
 
 ## 类型声明文件
 
-xxx.d.ts 文件，为现有的 js 文件提供类型信息。
+`.d.ts` 文件只提供类型声明，不提供运行时实现。
+
+常见来源：
+
+- 库自带类型声明。
+- `@types/*` 社区声明包。
+- 项目内部自己补充的全局或模块声明。
+
+```ts
+declare module "legacy-lib" {
+  export function parse(input: string): unknown
+}
+```

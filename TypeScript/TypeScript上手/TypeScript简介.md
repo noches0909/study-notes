@@ -1,83 +1,87 @@
 # TypeScript 简介
 
-## 介绍
+## 定位
 
-1. ts 由微软开发，是基于 js 的扩展语言
-2. ts 包含了 js 的所有内容，是 js 的超急
-3. ts 新增了静态类型检查、接口、泛型等现代开发特性，适合大型项目
-4. ts 需要编译为 js，然后才能交给浏览器或者其他 js 的运行环境执行
+TypeScript 是 JavaScript 的类型化超集，由微软维护。它不会改变 JavaScript 的运行时行为，而是在开发和编译阶段增加类型检查、编辑器提示、重构能力和接口约束。
 
-## 命令行编译
+核心理解：
 
-安装 typescript
+- TypeScript = JavaScript + 静态类型系统。
+- 浏览器和 Node.js 运行的仍然是 JavaScript。
+- 类型只在编译期生效，运行时校验需要自己写。
+- 类型系统的主要价值是提前暴露错误、描述数据结构、提升协作维护效率。
 
-```bash
-npm i typescript -g
-```
-
-自动化编译
+## 安装与编译
 
 ```bash
-tsc --init
-tsc --watch
+npm i -D typescript
+npx tsc --init
+npx tsc --watch
 ```
+
+常见命令：
+
+- `tsc file.ts`：编译单个文件。
+- `tsc --init`：生成 `tsconfig.json`。
+- `tsc --watch`：监听文件变化并自动编译。
+- `tsc --noEmit`：只做类型检查，不输出 JavaScript。
 
 ## 类型总览
 
-js：
+JavaScript 原有类型：
 
-1. string
-2. number
-3. boolean
-4. null
-5. undefined
-6. bigint
-7. symbol
-8. object（Array、Function、Date、Error 等）
+- `string`
+- `number`
+- `boolean`
+- `null`
+- `undefined`
+- `bigint`
+- `symbol`
+- `object`，包含数组、函数、日期、正则等对象值
 
-ts：
+TypeScript 补充的常用类型：
 
-1. 包含所有 js 类型
-2. any
-3. unknown
-4. never
-5. void
-6. tuple 元祖
-7. enum 枚举
+- `any`：放弃类型检查。
+- `unknown`：类型安全的未知值。
+- `never`：永远不会出现的值。
+- `void`：函数返回值不被使用。
+- tuple：元组，固定位置的数组结构。
+- enum：枚举，会生成运行时代码。
+- literal：字面量类型，如 `"success"`、`1`、`true`。
+- union：联合类型，如 `string | number`。
+- intersection：交叉类型，如 `A & B`。
 
-自定义类型的方式：type、interface
+自定义类型主要使用：
+
+- `type`：类型别名，适合联合、交叉、工具类型、复杂组合。
+- `interface`：接口，适合描述对象、类的结构，支持继承和声明合并。
 
 ## 大小写类型
 
-String、 Number 这些内置构造函数是用来创建包装对象的，实际开发中基本不用
+实际开发中优先使用小写原始类型：`string`、`number`、`boolean`。
 
 ```ts
 let a: string = "hello" // 推荐
 let b: String = "world" // 不推荐
-// a的类型为string，b的类型为object
 
-a = "hello1" // 无问题
-a = new String("hello2") // 会报错
+a = "hello1"
+a = new String("hello2") // 报错
 
-b = "world1" // 无问题
-b = new String("world2") // 无问题
+b = "world1"
+b = new String("world2") // 可以，但容易混淆原始值和包装对象
 ```
 
-### 拓展自动装箱
+`String`、`Number`、`Boolean` 是包装对象类型，不是日常变量标注的首选。
+
+## 自动装箱
+
+JavaScript 允许原始值临时访问包装对象上的属性和方法：
 
 ```js
-// 原始类型字符串
-let str = "hello"
+const str = "hello"
 
-// 访问str.length时，js如下执行
-let size = function () {
-  // 1.自动装箱：创建一个临时的String对象包装字符串
-  let tempStringObject = new String(str)
-  // 2.访问对象的length属性
-  let lengthValue = tempStringObject.length
-  // 3.自动销毁临时对象，无感
-  return lengthValue
-}
-
-console.log(size)
+console.log(str.length)
+console.log(str.toUpperCase())
 ```
+
+可以理解为运行时临时把原始字符串包装成 `String` 对象，访问结束后再销毁。因此 `string` 能调用字符串方法，但它仍然不是 `String` 对象。

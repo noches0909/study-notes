@@ -1,18 +1,18 @@
-﻿import { Dictionarise } from "../enum"
+import { StorageMeta } from "../enum"
 
 export type Key = string
-export type Expire = Dictionarise.permanent | number // 永久或者时间戳
+export type Expire = StorageMeta.permanent | number // 永久或者时间戳
 
 // 读取结果类型
 export interface Result<T> {
   message: string
-  value: T | null
+  value: T
 }
 
 // 存入数据类型
 export interface Data<T> {
   value: T
-  [Dictionarise.expire]: Expire
+  [StorageMeta.expire]: Expire
 }
 
 // 存储类约束

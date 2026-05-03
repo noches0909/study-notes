@@ -1,120 +1,183 @@
 # TypeScript 类型
 
-## any
+## 顶层与底层类型
 
-**任意类型**
+### any
 
-any 类型的变量可以赋值给任何类型的变量，实际开发慎用 any。
-
-## unknown
-
-**未知类型**
-
-unknown 是类型安全的 any。
-
-## never
-
-**无值类型**
-
-不可以有任何值，实际开发较少遇到，通常用来限制函数的返回，比如抛出错误，或是由 ts 推断得出的类型。
-
-## void
-
-**空类型**
-
-通常用作函数返回的声明，意为【函数不返回值，且调用者不依赖其返回值进行操作】,仅从返回值层面可以理解为 undefined，但是对该类型的数据进行任何操作都会报错，而 undefined 通常不会。
-
-## object
-
-**对象类型**
-
-包含了所有非原始类型，范围太大，实际开发很少直接用它。
+`any` 会关闭类型检查，既可以接收任何值，也可以赋值给任何类型。
 
 ```ts
-// 声明对象类型
-let person: {
-  name: "yy"
-  age: "18"
-  [key: string]: any // 索引签名
+let value: any = 1
+value.foo.bar()
+```
+
+适合临时迁移旧代码，不适合作为长期设计。
+
+### unknown
+
+`unknown` 表示未知值，比 `any` 安全。使用前必须先缩小类型。
+
+```ts
+function print(value: unknown) {
+  if (typeof value === "string") {
+    console.log(value.toUpperCase())
+  }
 }
-
-// 声明函数类型
-let count: (a: number, b: number) => number
-// 箭头符号为ts中表示函数类型，描述参数类型和返回类型
-
-// 声明数组类型
-let arr1: string[]
-let arr2: Array<number>
 ```
 
-## tuple
+### never
 
-**元祖类型**
-
-tuple 不是关键字，它是一种数量固定的特殊的数组类型
+`never` 表示不可能出现的值，常见于抛错函数、死循环、穷尽检查。
 
 ```ts
-let arr1 = [string, number]
-let arr2 = [string, boolean?]
-let arr3 = [string, ...number[]]
+function fail(message: string): never {
+  throw new Error(message)
+}
 ```
+
+### void
+
+`void` 常用于函数返回值，表示调用者不应该依赖返回结果。
+
+```ts
+function log(message: string): void {
+  console.log(message)
+}
+```
+
+## 对象类型
+
+### object
+
+`object` 表示非原始值，范围较大，通常不直接用于业务数据结构。
+
+```ts
+let value: object
+
+value = {}
+value = []
+value = () => {}
+value = "text" // 报错
+```
+
+### 对象字面量类型
+
+```ts
+let person: {
+  name: string
+  age: number
+  readonly id?: string
+  [key: string]: unknown
+}
+```
+
+- `?`：可选属性。
+- `readonly`：只读属性。
+- `[key: string]: unknown`：索引签名，允许额外字符串键。
+
+## 数组与元组
+
+数组用于同类元素集合：
+
+```ts
+let names: string[] = ["Tom", "Jerry"]
+let scores: Array<number> = [90, 95]
+```
+
+元组用于固定位置结构：
+
+```ts
+let point: [number, number] = [10, 20]
+let result: [string, boolean?] = ["ok"]
+let row: [string, ...number[]] = ["score", 90, 88, 96]
+```
+
+## 联合与交叉
+
+联合类型表示“可以是其中之一”：
+
+```ts
+type Id = string | number
+```
+
+交叉类型表示“同时具备”：
+
+```ts
+type Named = { name: string }
+type Aged = { age: number }
+type Person = Named & Aged
+```
+
+## 字面量类型
+
+字面量类型用于约束固定取值。
+
+```ts
+type Status = "idle" | "loading" | "success" | "error"
+type Size = "sm" | "md" | "lg"
+```
+
+实际开发中，它常常比 `enum` 更轻量。
 
 ## enum
 
-**枚举类型**
-
-enum 定义一组命名常量，增加可读性，更好维护
+`enum` 定义一组命名常量，会生成运行时代码。
 
 ```ts
-// 数字枚举，自动递增，反向映射
 enum Direction {
-  up,
-  down,
-  left,
-  right,
+  Up,
+  Down,
+  Left,
+  Right,
 }
-console.log(Direction.up) // 0
 
-// 字符串枚举，无反向映射
+console.log(Direction.Up) // 0
+console.log(Direction[0]) // "Up"
+```
+
+字符串枚举没有数字枚举的反向映射：
+
+```ts
 enum Direction {
-  up = "Up",
-  down = "Down",
-  left = "Left",
-  right = "Right",
+  Up = "UP",
+  Down = "DOWN",
 }
-console.log(Direction.up) // Up
+```
 
-// 常量枚举
-// const关键字能在编译时内联，避免生产额外的代码
-// 内联：ts在编译中将枚举值的引用替换为实际值，不会生成额外的枚举对象，减少代码量，提高运行性能
-const enum Direction {
-  up,
-  down,
-  left,
-  right,
-}
+在现代前端项目中，也可以用 `as const` 对象替代：
+
+```ts
+const Direction = {
+  Up: "UP",
+  Down: "DOWN",
+} as const
+
+type Direction = (typeof Direction)[keyof typeof Direction]
 ```
 
 ## type
 
-**类型别名**
-
-更好的复用和扩展
+`type` 用来给类型起别名，适合组合类型。
 
 ```ts
-// 联合类型
-type a = number | string
+type UserId = string | number
 
-// 交叉类型
-type x = { m: number }
-type y = { n: string }
-type b = x & y
+type User = {
+  id: UserId
+  name: string
+}
 
-// 使用类型声明函数返回void时，ts并不会严格要求函数返回为空
-type fn = () => void
-
-const arr1 = [1, 2, 3]
-const arr2 = [0]
-arr1.forEach((el) => arr2.push(el))
-// Array.prototype.forEach期望返回void，而Array.prototype.push返回数组最新长度
+type Handler = (event: Event) => void
 ```
+
+当函数类型返回 `void` 时，表示调用方不使用返回值，并不强制实现函数只能返回 `undefined`。
+
+```ts
+type Callback = () => void
+
+const callback: Callback = () => {
+  return 1
+}
+```
+
+这也是 `forEach` 可以接受返回值函数的原因，因为返回值会被忽略。

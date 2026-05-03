@@ -1,42 +1,87 @@
-# TS 个人归纳
+# TS 阶段归纳
 
-## 安装
+这份笔记偏具体使用：不是按语法完整铺开，而是整理开发中容易反复遇到、也最容易写错的 TypeScript 习惯。
 
-```sql
-bun add typescript -g
-tsc -v
+## 安装与检查
+
+```bash
+bun add -d typescript
+bunx tsc --init
+bunx tsc --noEmit
 ```
+
+全局安装也能用，但项目里更推荐放到 `devDependencies`，保证团队、CI 和本地使用同一个 TypeScript 版本。
 
 ## Object、object、{}
 
-- Object: 包含所有类型
-- object: 非原始类型的类型
-- {}: 可以理解为 new Object，包含所有类型
+这三个类型容易混。
+
+- `Object`：几乎所有非 `null`、`undefined` 的值都可以赋给它，不推荐用于业务类型。
+- `object`：非原始类型，不包含 `string`、`number`、`boolean`、`symbol`、`bigint`、`null`、`undefined`。
+- `{}`：表示非 `null`、`undefined` 的值，原始值也能赋给它。
+
+```ts
+let a: Object
+a = 1
+a = "text"
+a = {}
+
+let b: object
+b = {}
+b = []
+b = () => {}
+b = 1 // 报错
+
+let c: {}
+c = 1
+c = "text"
+c = {}
+c = null // strictNullChecks 下报错
+```
+
+业务对象优先写明确结构：
+
+```ts
+type User = {
+  id: string
+  name: string
+}
+```
 
 ## 函数类型
 
+### 函数接口
+
 ```ts
-// 接口声明函数类型
 interface Fn {
   (name: string): number[]
 }
 
-const fn: Fn = function (name: string) {
+const fn: Fn = (name) => {
+  console.log(name)
   return [1]
 }
 ```
 
-ts 可以定义 this 的类型，函数参数的第一个参数，js 中不可以，
+更常见的写法是类型别名：
+
+```ts
+type Fn = (name: string) => number[]
+```
+
+### this 参数
+
+TypeScript 可以给函数声明一个假的第一个参数 `this`，它只参与类型检查，不会出现在 JavaScript 运行时参数里。
 
 ```ts
 interface Obj {
   user: number[]
-  add: (this: Obj, num: number) => void
+  add(this: Obj, num: number): void
 }
 
-let obj: Obj = {
+const obj: Obj = {
   user: [1, 2, 3],
-  add(this: Obj, num: number) {
+  add(num) {
     this.user.push(num)
   },
 }
@@ -44,139 +89,229 @@ let obj: Obj = {
 obj.add(4)
 ```
 
-**函数重载**
+对象方法建议使用普通函数语法；箭头函数没有自己的 `this`。
 
-在一个函数中实现传入不同的参数，返回不同的结果
+### 函数重载
+
+重载用于表达“不同入参对应不同返回值”。
 
 ```ts
-const arr = []
-function fn(add: number[]): number[]
-function fn(id: number): number[]
-function fn(ids: number | number[]): number[] {
-  if (Array.isArray(ids)) {
-    arr.push(...ids)
-  } else {
-    return arr.filter((v) => v == ids)
+const ids: number[] = []
+
+function findOrAdd(add: number[]): number[]
+function findOrAdd(id: number): number[]
+function findOrAdd(value: number | number[]): number[] {
+  if (Array.isArray(value)) {
+    ids.push(...value)
+    return ids
   }
+
+  return ids.filter((item) => item === value)
 }
 ```
 
+注意：
+
+- 重载签名写在前面，实现签名写在最后。
+- 实现签名必须能兼容所有重载签名。
+- 能用联合类型清楚表达时，不必强行重载。
+
 ## 类型断言
 
-编译期指令，不会强制运行时校验
+类型断言只影响编译期，不做运行时校验。
 
 ```ts
-const el = document.getElementById("app") as HTMLDivElement // jsx中更推荐
-const el = <HTMLDivElement>document.getElementById("app")
+const el = document.getElementById("app") as HTMLDivElement | null
 ```
+
+在 JSX/TSX 中只能使用 `as` 写法，因为 `<HTMLDivElement>value` 会和 JSX 标签冲突。
+
+更安全的写法是先判断：
+
+```ts
+const el = document.getElementById("app")
+
+if (el instanceof HTMLDivElement) {
+  el.dataset.ready = "true"
+}
+```
+
+双重断言要克制：
+
+```ts
+const value = source as unknown as Target
+```
+
+这通常表示类型信息缺失，最好补类型声明或运行时校验。
 
 ## symbol
 
-```tsx
-// symbol意味唯一类型，所以a1和a2的值不相等
-let a1: symbol = Symbol(1)
-let a2: symbol = Symbol(1)
+`Symbol()` 每次都会创建唯一值，即使描述相同也不相等。
 
-// for会全局查看有没有注册过该key，有的话直接使用，没有才创建新的
-Symbol.for("1") === Symbol.for("1") // true
+```ts
+const a1 = Symbol("id")
+const a2 = Symbol("id")
+
+console.log(a1 === a2) // false
 ```
 
-正常 for in、Object.keys、无法获取到 symbol 属性，使用`Reflect.ownKeys()`可以遍历到
+`Symbol.for()` 会从全局 symbol 注册表中查找或创建。
+
+```ts
+Symbol.for("id") === Symbol.for("id") // true
+```
+
+普通的 `for...in`、`Object.keys()`、`JSON.stringify()` 都不会枚举 symbol 键。需要完整获取自身键时使用：
+
+```ts
+Reflect.ownKeys(obj)
+```
 
 ## 泛型
 
-理解为动态类型
+泛型可以理解为“类型参数”，不是动态类型。它让一段实现保留类型关系。
 
-**泛型约束**
+```ts
+function first<T>(items: T[]): T | undefined {
+  return items[0]
+}
 
-`extends` 关键字，前面的类型只能被约束为后面的类型
+const value = first(["a", "b"]) // string | undefined
+```
 
-```tsx
+### 泛型约束
+
+`extends` 用来限制泛型必须符合某种结构。
+
+```ts
+function getName<T extends { name: string }>(value: T): string {
+  return value.name
+}
+```
+
+### keyof 与映射类型
+
+```ts
 interface Data {
   name: string
   age: number
 }
 
-type Options<T extends object> = {
-  readonly [key in keyof T]: T[key]
+type ReadonlyData<T extends object> = {
+  readonly [Key in keyof T]: T[Key]
 }
 
-type B = Options<Data>
+type Result = ReadonlyData<Data>
 ```
 
-**泛型工具**
+### 常用工具类型
 
-- Partial<T>：将 T 的所有属性变为可选（?）
-- Required<T>：将 T 的所有属性变为必选（-?）
-- Readonly<T>：将 T 的所有属性变为只读
-- Pick<T, K>：从 T 中选择 K 属性构造一个新类型
-- Omit<T, K>：从 T 中剔除 K 属性构造一个新类型
-- Record<K, T>：构造一个对象类型，其属性键为 K，属性值为 T
-- Exclude<T, U>：从 T 中剔除 U 的类型
-- Extract<T, U>：从 T 中提取 U 的类型
-- NonNullable<T>：剔除 T 中的 null 和 undefined
-- ReturnType<T>：获取函数 T 的返回类型
-- InstanceType<T>：获取构造函数 T 的实例类型
+- `Partial<T>`：所有属性可选。
+- `Required<T>`：所有属性必选。
+- `Readonly<T>`：所有属性只读。
+- `Pick<T, K>`：从 `T` 中选择部分属性。
+- `Omit<T, K>`：从 `T` 中排除部分属性。
+- `Record<K, T>`：构造键为 `K`、值为 `T` 的对象类型。
+- `Exclude<T, U>`：从联合类型 `T` 中剔除可赋给 `U` 的成员。
+- `Extract<T, U>`：从联合类型 `T` 中提取可赋给 `U` 的成员。
+- `NonNullable<T>`：剔除 `null` 和 `undefined`。
+- `ReturnType<T>`：获取函数返回值类型。
+- `Parameters<T>`：获取函数参数元组类型。
+- `InstanceType<T>`：获取构造函数的实例类型。
+- `Awaited<T>`：递归获取 Promise resolve 后的类型。
 
-**infer**
+### infer
 
-推断泛型的参数，用于条件类型中，只能出现在 extends 子语句中
+`infer` 只能出现在条件类型的 `extends` 分支中，用于提取类型。
 
 ```ts
-// 声明User接口类型
-interface User {
+type UnwrapPromise<T> = T extends Promise<infer U> ? UnwrapPromise<U> : T
+
+type User = {
   name: string
   age: number
 }
 
-// 声明PromiseType类型，值为嵌套的Promise<User>
-type PromiseType = Promise<Promise<Promise<User>>>
-
-// 条件类型，判断T是否为Promise类型，如果是则使用infer推断出U类型，否则返回T本身
-// 递归调用GetPromiseType，直到U不再是Promise类型为止
-type GetPromiseType<T> = T extends Promise<infer U> ? GetPromiseType<U> : T
-
-type T = GetPromiseType<PromiseType> // User
+type Result = UnwrapPromise<Promise<Promise<User>>> // User
 ```
 
-**infer 递归**
+递归处理元组：
 
 ```ts
-// 将它翻转
-type Arr = [1, 2, 3, 4]
-
-type ReverArr<T extends any[]> = T extends [infer First, ...infer Other]
-  ? [...ReverArr<Other>, First]
+type Reverse<T extends unknown[]> = T extends [infer First, ...infer Rest]
+  ? [...Reverse<Rest>, First]
   : T
 
-type Arr2 = ReverArr<Arr> // 4 3 2 1
+type Result = Reverse<[1, 2, 3, 4]> // [4, 3, 2, 1]
 ```
 
-## 命名空间
+## 命名空间与声明文件
 
-隔离类型，避免全局污染
+现代项目业务代码优先使用 ES Module：
 
-namespace 里面的变量和方法必须要导出才可以使用，支持嵌套，命名空间也需要导出，支持合并、简化
+```ts
+export function parse(input: string) {
+  return JSON.parse(input)
+}
+```
 
-可以用在跨端项目中，为不同的平台提供不同的变量方法
+`namespace` 主要在声明文件、全局库兼容、旧项目中出现。
 
-## 声明文件
+`.d.ts` 是声明文件，只提供类型信息，不提供运行时代码。
 
-d.ts：声明文件后缀
+```ts
+declare module "legacy-lib" {
+  export function request(url: string): Promise<unknown>
+}
+```
 
-`declare`关键字可以扩充变量、方法、类等，变为全局
+扩展全局类型时要显式进入全局作用域：
+
+```ts
+export {}
+
+declare global {
+  interface Window {
+    appVersion: string
+  }
+}
+```
 
 ## 装饰器
 
-在不修改原结构的情况下，通过装饰器为类添加属性和方法
+装饰器适合框架和横切逻辑，不适合把普通业务流程藏起来。
 
-## 进阶内容
+TypeScript 里要区分两套装饰器：
 
-### proxy 和 reflect
+- legacy decorators：老项目常见，启用 `experimentalDecorators`，使用 `target`、`propertyKey`、`descriptor`。
+- standard decorators：TypeScript 5.0 起支持的新语义，使用 `value` 和 `context`。
 
-- proxy 用于创建一个对象的代理，从而可以对该对象进行拦截和修改
+新版方法装饰器示例：
 
-- reflect 用于操作对象的底层方法
+```ts
+function Logger<This, Args extends unknown[], Return>(
+  original: (this: This, ...args: Args) => Return,
+  context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Return>,
+) {
+  return function (this: This, ...args: Args): Return {
+    console.log("start", String(context.name))
+    const result = original.call(this, ...args)
+    console.log("end", String(context.name))
+    return result
+  }
+}
+
+class Service {
+  @Logger
+  run(id: string) {
+    return id
+  }
+}
+```
+
+## Proxy 和 Reflect
+
+`Proxy` 用来代理对象操作，`Reflect` 提供与代理 trap 对应的默认对象操作。
 
 ```ts
 const obj = {
@@ -184,10 +319,7 @@ const obj = {
   age: 18,
 }
 
-// object.name 等效
-// Reflect.get(obj, "name")
-
-let objProxy = new Proxy(obj, {
+const objProxy = new Proxy(obj, {
   get(target, prop, receiver) {
     console.log("get", prop)
     return Reflect.get(target, prop, receiver)
@@ -197,41 +329,90 @@ let objProxy = new Proxy(obj, {
     return Reflect.set(target, prop, value, receiver)
   },
 })
-
-// reflect 的第三个参数用于确定 this 指向
 ```
 
-### 类型守卫
+`receiver` 会影响访问器属性中的 `this` 指向，写代理时尽量把它传给 `Reflect`。
+
+## 类型守卫
+
+类型守卫用于把宽类型缩小成具体类型。
 
 ```ts
-// 类型收缩
-const isObj = (arg: any) => ({}.toString.call(arg) === "[object Object]")
-// 自定义守卫：如果函数返回 true，则 arg 的类型就是后面的类型
-const isStr = (arg: any): arg is string => typeof arg === "string"
-const isNum = (arg: any): arg is number => typeof arg === "number"
-const isFn = (arg: any): arg is Function => typeof arg === "function"
-```
-
-### 协变（鸭子类型）
-
-- 协变：值类型，子类型可以赋值给父类型（子类型内的类型可以全覆盖父类型）
-- 逆变：函数参数类型，父类型可以赋值给子类型（子类型内的类型可以部分覆盖父类型）
-- 双向协变：既可以赋值给父类型，也可以赋值给子类型。不安全，需要通过`--strictFunctionTypes`开启。
-
-**infer 协变**：会返回联合类型
-
-```ts
-const obj = {
-  name: "ts",
-  age: 18,
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return Object.prototype.toString.call(value) === "[object Object]"
 }
 
-type Bar<T> = T extends { name: infer U; age: infer U } ? U : never
+function isString(value: unknown): value is string {
+  return typeof value === "string"
+}
 
-type T = Bar<typeof obj> // string | number
+function isNumber(value: unknown): value is number {
+  return typeof value === "number"
+}
 ```
 
-**infer 逆变**：会返回交叉类型
+判别联合是业务里最实用的类型守卫：
+
+```ts
+type Loading = { status: "loading" }
+type Success = { status: "success"; data: string[] }
+type Failed = { status: "failed"; error: Error }
+
+type State = Loading | Success | Failed
+
+function render(state: State) {
+  switch (state.status) {
+    case "loading":
+      return "loading"
+    case "success":
+      return state.data.join(",")
+    case "failed":
+      return state.error.message
+    default:
+      return assertNever(state)
+  }
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unexpected value: ${value}`)
+}
+```
+
+## 协变、逆变与函数参数
+
+可以先记一个实用结论：
+
+- 对象属性通常按结构兼容，字段更多的值可以赋给字段更少的类型。
+- 函数返回值更像协变：返回更具体的类型通常安全。
+- 函数参数更像逆变：能处理更宽泛参数的函数，可以放到需要更具体参数的位置。
+
+```ts
+type Animal = { name: string }
+type Dog = { name: string; bark(): void }
+
+let dog: Dog = { name: "A", bark() {} }
+let animal: Animal = dog // OK，Dog 至少拥有 Animal 的结构
+```
+
+函数参数在 `strictFunctionTypes` 下更严格：
+
+```ts
+type DogHandler = (dog: Dog) => void
+type AnimalHandler = (animal: Animal) => void
+
+let handleAnimal: AnimalHandler = (animal) => console.log(animal.name)
+let handleDog: DogHandler = handleAnimal // OK，能处理 Animal，自然能处理 Dog
+```
+
+`infer` 在协变位置可能推出联合类型：
+
+```ts
+type Bar<T> = T extends { name: infer U; age: infer U } ? U : never
+
+type Result = Bar<{ name: string; age: number }> // string | number
+```
+
+在逆变位置可能推出交叉类型；对于互不相交的原始类型，交叉结果会变成 `never`。
 
 ```ts
 type Foo<T> = T extends {
@@ -239,12 +420,78 @@ type Foo<T> = T extends {
   b: (x: infer U) => void
 }
   ? U
-  : "111"
+  : never
 
-type T = Foo<{
+type Result = Foo<{
   a: (x: string) => void
   b: (x: number) => void
 }> // never
 ```
 
-## TS 封装 localStorage 并支持过期时间
+## 封装 localStorage 并支持过期时间
+
+浏览器 `localStorage` 只能存字符串，因此要处理序列化、反序列化、过期时间和异常。
+
+```ts
+type StoragePayload<T> = {
+  value: T
+  expiresAt: number | null
+}
+
+type SetOptions = {
+  ttl?: number
+}
+
+class LocalStorageCache {
+  set<T>(key: string, value: T, options: SetOptions = {}) {
+    const payload: StoragePayload<T> = {
+      value,
+      expiresAt: options.ttl ? Date.now() + options.ttl : null,
+    }
+
+    localStorage.setItem(key, JSON.stringify(payload))
+  }
+
+  get<T>(key: string): T | null {
+    const raw = localStorage.getItem(key)
+
+    if (!raw) {
+      return null
+    }
+
+    try {
+      const payload = JSON.parse(raw) as StoragePayload<T>
+
+      if (payload.expiresAt && payload.expiresAt <= Date.now()) {
+        localStorage.removeItem(key)
+        return null
+      }
+
+      return payload.value
+    } catch {
+      localStorage.removeItem(key)
+      return null
+    }
+  }
+
+  remove(key: string) {
+    localStorage.removeItem(key)
+  }
+
+  clear() {
+    localStorage.clear()
+  }
+}
+```
+
+使用：
+
+```ts
+const cache = new LocalStorageCache()
+
+cache.set("user", { id: "1", name: "Tom" }, { ttl: 60_000 })
+
+const user = cache.get<{ id: string; name: string }>("user")
+```
+
+注意：`get<T>()` 的 `T` 仍然只是编译期承诺，不能证明本地存储里的真实数据一定符合结构。高可靠场景应配合运行时 schema 校验。
