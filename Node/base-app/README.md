@@ -390,3 +390,87 @@ fs.symlinkSync("./index.txt", "./index3.txt")
 ```
 
 > pnpm的底层就是用的硬链接和软链接来实现依赖的共享
+
+### crypto
+
+密码学模块，提供了通用的加密哈希算法。
+
+```js
+// 1. 对称加密算法：双方协商定义一个密钥和iv
+const key = crypto.randomBytes(32) // 32位密钥
+const iv = Buffer.from(crypto.randomBytes(16)) // 初始化向量16位，保证每次密钥串都是不一样的
+const cipher = crypto.createCipheriv("aes-256-cbc", key, iv)
+cipher.update("123", "utf-8", "hex")
+cipher.final("hex") // 输出密文 16进制
+
+// 同等解密
+const de = crypto.createDeCipheriv("aes-256-cbc", key, iv)
+de.update(result, "hex", "utf-8")
+de.final("utf-8") // 输出解密内容
+
+// 2. 非对称加密算法：生成公钥和私钥，公钥对外公开，私钥仅管理员拥有
+const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+  modulusLength: 2048, // 长度越长越安全越慢
+})
+
+// 公钥加密
+const encrypted = crypto.publicEncrypt(publicKey, Buffer.from("123"))
+encrypted.toString("hex")
+
+// 私钥解密
+const decrypted = crypto.privateDecrypt(privateKey, encrypted)
+decrypted.toString()
+
+// 3. 哈希函数，单向不可逆，不能被解密
+const hash = crypto.createHash("md5") // 常用sha256或者md5
+hash.update("123")
+hash.digest("hex")
+```
+
+### zlib
+
+数据压缩与解压缩的模块
+
+gzip算法适用于文件的压缩，deflate适用于网络传输
+
+```js
+// 以下代码以gzip为例子，deflate算法则需要修改后缀和api即可
+// 压缩
+const readStream = fs.createReadStream("index.txt")
+const writeStream = fs.createWriteStream("index.txt.gz")
+readStream.pipe(zlib.createGzip()).pipe(writeStream)
+
+// 解压
+const readStream = fs.createReadStream("index.txt.gz")
+const writeStream = fs.createWriteStream("index.txt")
+readStream.pipe(zlib.createGunzip()).pipe(writeStream)
+
+// 网络传输
+const server = http.createServer((req, res) => {
+  const txt = "123".repeat(1000)
+  res.setHeader("Content-Encoding", "deflate")
+  res.setHeader("Content-type", "text/plan;charset=utf-8")
+  const result = zlib.defalteSync(txt)
+  res.end(result)
+})
+
+server.listen(3000, () => {
+  console.log("服务器启动成功")
+}) // 小于65535
+```
+
+## 编写脚手架
+
+1. 自定义命令，而不是node xx执行脚本
+
+2. -V --help 命令行交互工具
+
+3. 下载模版
+
+需要用到至少4个库：commander（命令行工具）、inquirer（命令行交互）、ora（命令行动画）、download-git-repo（下载git仓库）
+
+先在`package.json`里添加自定义命令`bin`，再通过`npm link`创建软链接挂载到全局
+
+编写脚本[示例](./testCli.js)
+
+> markdown转html插件推荐：ejs、markdown、browser-sync

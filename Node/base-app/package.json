@@ -10,7 +10,14 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "bin": {
+    "test-cli": "./testCli.js"
+  },
   "dependencies": {
-    "jsdom": "^29.0.2"
+    "commander": "^14.0.3",
+    "download-git-repo": "^3.0.2",
+    "inquirer": "^13.4.2",
+    "jsdom": "^29.0.2",
+    "ora": "^9.4.0"
   }
 }
