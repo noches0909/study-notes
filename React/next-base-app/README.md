@@ -396,3 +396,35 @@ bunx prisma init
 编写[接口](./src/app/api/route.ts)，增删改查接口定义
 
 编写测试[调用](./test.http)，模拟数据库操作
+
+## Auth登录
+
+身份验证功能，推荐使用better-auth库，初始化配置过程较为繁琐
+
+```zsh
+# 安装
+bun install better-auth
+
+# 生成密钥
+openssl rand -base64 32
+```
+
+- 在`.env`中编写环境变量
+
+- 代码中生成客户端文件：`bunx prisma generate`
+
+- 创建并导出[auth实例](./src/lib/auth.ts)
+
+- 生成数据表 `bunx auth@latest generate`
+
+- 数据库迁移+重新生成客户端文件：
+
+  `bunx prisma migrate dev --name init`
+
+  `bunx prisma generate`
+
+- 挂载处理程序 新建[auth路由](./src/app/api/auth/[...all]/route.ts)
+
+- 新建[客户端实例配置文件](./src/lib/auth-client.ts)
+
+注册登录直接调用官方api即可。
