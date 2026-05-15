@@ -381,13 +381,13 @@ bun install @prisma/client @prisma/adapter-pg pg dotenv
 bunx prisma init
 ```
 
-- 在[prisma](./prisma/schema.prisma)中编写数据库表
+1. 在[prisma](./prisma/schema.prisma)中编写数据库表
 
-- 在`.env`中编写环境变量
+2. 在`.env`中编写环境变量
 
-- 执行数据库迁移：`bunx prisma migrate dev --name init`
+3. 执行数据库迁移：`bunx prisma migrate dev --name init`
 
-- 代码中生成客户端文件：`bunx prisma generate`
+4. 代码中生成客户端文件：`bunx prisma generate`
 
 ### 增删改查
 
@@ -409,22 +409,38 @@ bun install better-auth
 openssl rand -base64 32
 ```
 
-- 在`.env`中编写环境变量
+1. 在`.env`中编写环境变量
 
-- 代码中生成客户端文件：`bunx prisma generate`
+2. 代码中生成客户端文件：`bunx prisma generate`
 
-- 创建并导出[auth实例](./src/lib/auth.ts)
+3. 创建并导出[auth实例](./src/lib/auth.ts)
 
-- 生成数据表 `bunx auth@latest generate`
+4. 生成数据表 `bunx auth@latest generate`
 
-- 数据库迁移+重新生成客户端文件：
+5. 数据库迁移+重新生成客户端文件：
 
-  `bunx prisma migrate dev --name init`
+`bunx prisma migrate dev --name init`
 
-  `bunx prisma generate`
+`bunx prisma generate`
 
-- 挂载处理程序 新建[auth路由](./src/app/api/auth/[...all]/route.ts)
+6. 挂载处理程序 新建[auth路由](./src/app/api/auth/[...all]/route.ts)
 
-- 新建[客户端实例配置文件](./src/lib/auth-client.ts)
+7. 新建[客户端实例配置文件](./src/lib/auth-client.ts)
 
 注册登录直接调用官方api即可。
+
+## Vercel 部署
+
+- Next.js同源，同一团队维护，一致性。
+
+- 边缘网络：全球边缘节点部署，静态资源可就近响应。
+
+- 默认Https自动证书，快速上线和测试。
+
+- 连接git工作流，自动构建生产部署。
+
+连接Vercel的两种方式
+
+- 在Vercel官网关联git项目
+
+- 安装Vercel，使用`vercel link`连接本地项目
