@@ -459,6 +459,36 @@ server.listen(3000, () => {
 }) // 小于65535
 ```
 
+### http
+
+Node.js中用于创建和处理HTTP服务器和客户端的核心模块。
+
+- 创建Web服务器：接收客户端请求并响应，处理路由和业务
+
+- 构建RESTful API：使用HTTP请求方法来定义API
+
+- 代理服务器：转发客户端请求到其他服务器
+
+- 文件服务器：提供静态文件
+
+#### 反向代理
+
+使用`http-proxy-middleware`库来实现，负载均衡，高可用性，缓存和性能优化，安全性，域名和路径重写。
+
+#### 动静分离
+
+动态资源：动态网页、API请求
+
+静态资源：HTML、CSS、JS、图像等
+
+使用`mime`库进行判断接口资源的请求
+
+#### 邮件服务
+
+使用`js-yaml nodemailer`这两个库来实现，任务的分配和跟踪、错误报告和故障排除、自动化构建和持续集成
+
+重要信息不能明文写在代码里面，存放在yaml文件或者环境变量里面，js-yaml用以解析yaml文件
+
 ## 编写脚手架
 
 1. 自定义命令，而不是node xx执行脚本
@@ -474,3 +504,41 @@ server.listen(3000, () => {
 编写脚本[示例](./testCli.js)
 
 > markdown转html插件推荐：ejs、markdown、browser-sync
+
+## express 框架
+
+十分轻量的node.js框架，基于HTTP模块创建，简化处理HTTP请求、响应和中间件的过程。
+
+同时express还支持路由模块化的拆分，更易管理。
+
+使用`nodemon`库可以实现热更新
+
+### 防盗链
+
+在网页中将其他网站的资源显示到自己的网页上，被链接网站会造成额外的带宽消耗和资源浪费。
+
+为防止被盗链：HTTP引用检查、Referrer检查、配置访问控制列表、使用防盗的插件和脚本
+
+### 响应头和请求头
+
+响应头是HTTP响应中发送的元数据信息，用以描述响应的特性、内容和行为，键值对的形式出现。
+
+cors：跨域资源共享，非同源请求（协议、域名、端口任一不同）会被浏览器拦截
+
+```js
+// * 允许所有资源访问，但是会导致获取不到session
+// 通常指定ip或网站：http://localhost:3000
+res.setHeader("Access-Control-Allow-Origin", "*")
+
+// 默认只支持get post head，可以追加。
+res.setHeader("Access-Control-Allow-Methods"， "GET,POST,PUT,DELETE,PATCH")
+
+// cors默认不支持Content-Type，需要手动加上
+res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+```
+
+以下情况浏览器会发起 OPTIONS 预检请求：
+
+- Content-type 为 application/json
+- 自定义请求头
+- 非普通请求：patch、put、delete
