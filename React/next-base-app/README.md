@@ -444,3 +444,17 @@ openssl rand -base64 32
 - 在Vercel官网关联git项目
 
 - 安装Vercel，使用`vercel link`连接本地项目
+
+## 数据库（DB）
+
+MySql是关系型数据库，最受欢迎的数据库系统之一，以表的形式存储。
+
+- oracle：商用
+
+- MongoDB：非关系型数据库
+
+- sqLite：嵌入式数据库
+
+现阶段最佳的数据库安装方式是通过docker安装，容器里处理，环境干净可卸载。
+
+SQL语句现阶段仅做理解，不死记硬背。
