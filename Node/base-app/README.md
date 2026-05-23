@@ -542,3 +542,33 @@ res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 - Content-type 为 application/json
 - 自定义请求头
 - 非普通请求：patch、put、delete
+
+## 数据库（DB）
+
+MySql是关系型数据库，最受欢迎的数据库系统之一，以表的形式存储。
+
+- oracle：商用
+
+- MongoDB：非关系型数据库
+
+- sqLite：嵌入式数据库
+
+现阶段最佳的数据库安装方式是通过docker安装，容器里处理，环境干净可卸载。
+
+SQL语句现阶段仅做理解，不死记硬背。
+
+在node中需要安装`mysql2`来进行mysql数据库的连接
+
+实际开发中我们几乎不会直接在代码中编写sql语句，有注入风险，通常会使用`knex prisma`这类orm框架，通过js代码操作数据库变更
+
+## JWT（鉴权）
+
+JSON Web Token，一种网络应用传输的标准，基于JSON的令牌在客户端和服务端之间传输
+
+JWT由三部分组件，以.分隔：
+
+- Header（头部）：Base64格式，包含令牌信息和加密算法等信息
+
+- Payload（负载）：Base64格式，包含身份授权信息和一些自定义信息
+
+- Signature（签名）：指定密钥对头部和负载进行签名
