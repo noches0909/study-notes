@@ -489,6 +489,20 @@ Node.js中用于创建和处理HTTP服务器和客户端的核心模块。
 
 重要信息不能明文写在代码里面，存放在yaml文件或者环境变量里面，js-yaml用以解析yaml文件
 
+### net
+
+创建基于网络的应用程序API，创建TCP服务器和客户端，处理网络通信。
+
+TCP是应用层和网络层之间的传输层协议
+
+#### socket.io
+
+http协议通常是一问一答的模式，部分需要实时通信的场景不适用，而轮询处理不好就是http攻击了。
+
+socket协议可以实现双向通信，即时传输
+
+原声的websocket我们使用的较少，socket.io是一个第三方框架：实时性、事件驱动、跨平台支持、容错性、扩展性。
+
 ## 编写脚手架
 
 1. 自定义命令，而不是node xx执行脚本
@@ -594,3 +608,17 @@ Nodejs通常通过`ioredis`库进行redis的连接
 通过`node-schedule`库进行操作
 
 cron表达式
+
+## serverLess（云函数）
+
+serverLess并不是新技术，而是一种架构模型，无服务架构，让开发者关注业务本身，而不是服务器运行成本，linux等。
+
+- FaaS：函数即服务
+
+- BaaS：后端即服务
+
+## 爬虫
+
+`npm install puppeteer`
+
+puppeteer是google开发和维护的nodejs爬虫库，通过Headless Chrome 或 Chromium 和自动化网页操作，它可以模拟用户在浏览器中的交互行为，还能获取网页内容和js执行代码
