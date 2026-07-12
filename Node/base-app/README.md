@@ -622,3 +622,67 @@ serverLess并不是新技术，而是一种架构模型，无服务架构，让�
 `npm install puppeteer`
 
 puppeteer是google开发和维护的nodejs爬虫库，通过Headless Chrome 或 Chromium 和自动化网页操作，它可以模拟用户在浏览器中的交互行为，还能获取网页内容和js执行代码
+
+## addon
+
+受nodejs本身的限制，需要借助C++编写来实现一些CPU密集型应用。比如`node-sass`
+
+## 文件上传下载
+
+- 大文件上传通常会分片
+
+- 断点续传
+
+使用multer进行文件的读取和存储
+
+使用cors解决跨域问题
+
+## http缓存
+
+通过HTTP响应头来控制，提高网站性能
+
+- 强缓存，之后不需要再向服务器发送请求，从浏览器缓存读取（内存缓存/硬盘缓存），由浏览器调度，状态码200
+
+```js
+// Expires通常不推荐使用，设置缓存过期时间
+res.setHeader("Expires", new Data().toUTCString())
+
+// Cache-Control常用：
+// public任何服务器都可以缓存，
+// private只能浏览器缓存，不包括代理服务器
+// max-age缓存的时间秒 优先级高于Expires
+res.setHeader("Cache-Control", "public, max-age=10")
+```
+
+- 协商缓存，状态码304
+  - Last-Modified 文件的最后修改时间，根据if-modified-since请求头字段判断
+  - ETag 文件内容的hash，根据if-none-match请求头字段判断
+
+```js
+// 强缓存和协商缓存同时出现，通常以强缓存优先
+// no-cache 不走强缓存
+// no-store 不走任何缓存
+res.setHeader("Cache-Control", "no-cache")
+```
+
+### http2
+
+http2是http1.1的下一个这个主要版本，有重大改进。
+
+- 多路复用，单个TCP连接上同时发送多个请求和响应
+
+- 二进制分帧层，在应用层和传输层之前加的，可以将响应和请求拆分为多个帧，协议更高效。
+
+> 目前浏览器不支持http访问http2，只能使用https
+
+通过`openssl`生成tls证书，发送https请求
+
+## 短链接
+
+通常用于分享，使用`shortid`生成一个唯一编码来关联真实长链接地址，以达到短链接的功能
+
+## 串口技术
+
+计算机和外部设备进行数据传输的通信技术，比如扫描仪、打印机等。
+
+主要使用`serialPort`来进行开发
