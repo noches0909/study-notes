@@ -717,3 +717,46 @@ nodejs想要实现远程桌面需要安装pyhone和c++，还有node-gyp插件。
 ## 杀毒
 
 ClamAV，开源的引擎
+
+## OSS
+
+对象存储解决方案，通常用来存文件。OSS是按照Bucket（桶）存储的。
+
+## libuv
+
+- 事件循环
+- 异步I/O操作
+- 网络通信
+- 定时器
+- 跨平台支持
+
+### 事件循环
+
+宏任务：
+
+1. timers，执行setTimeout和setInterval的回调
+2. pending callbacks，执行推迟的回调，比如IO、计时器等
+3. idle，prepare空闲状态，nodejs内部的使用
+4. poll，执行I/O相关的回调
+5. check，执行setImmediate的回调
+6. close callback，执行例如socket.on('close',...)关闭的回调
+
+虽然是这么个顺序，但是更新时间戳的时候非常耗时，并且check的执行效率很高，通常较早执行触发。
+
+微任务：
+
+- process.nextTick
+- promise.then
+
+## fastify
+
+nodejs上面更快的web框架，高性能，通常用在网关层
+
+### 网关层（gateway）
+
+- 路由：根据请求的条件来通过路由规则控制转发到不同的后端服务
+- 负载均衡：算法，将请求分发到各个后端服务，分散负载，提高性能
+- 缓存和性能优化：通过缓存减少后端请求
+- 信道加密：确保数据通信的安全，防止被窃听
+- 熔断：后端故障或异常时，可以停止请求的发送，提高网站的可靠性
+- 限流：限制请求以避免后端服务的过载，防止被恶意攻击
