@@ -132,5 +132,39 @@ func main() {
 	}
 }
 
-// 读值、
+// 读值、赋值
+// person.Name
+// person.Name = '老徐'
+```
+
+> 结构体stuct可以理解为js的class
+
+## map映射
+
+无序的键值对集合，通常用来做配置存储、统计次数、缓存结果等。
+
+零值是null，键必须是可比较的类型（string、int、数组等），不能是切片、函数、mao，值可以是任意类型。
+
+```go
+// map[键类型]值类型
+scores := map[sting]int {
+	"语文": 90
+	"数学": 80
+	"英语": 50
+}
+
+// var 方式创建
+var ages map[string]int // 仅创建句柄
+ages = make(map[string]int, 10) //扩容：make(类型, 预估大小)
+
+// 新增属性
+scores["物理"] = 70
+// 删除属性
+delete(scores, "语文")
+// 读取属性
+// scores["英语"]，可以直接读
+// 高级读取，ok为bool值，判断属性是否存在
+value, ok := scores["xx"]
+// 修改属性
+scores["英语"] = 100
 ```
