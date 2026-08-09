@@ -33,7 +33,7 @@ name := "yun"
 age := 30
 ```
 
-> 默认零值：声明变量的时候如果不赋值，会自动赋值“”、0。（不像js是undefined）
+> 默认零值：声明变量的时候如果不赋值，会自动赋值“”、0、false、[]。（不像js是undefined）
 
 ## 基础数据类型
 
@@ -47,3 +47,90 @@ age := 30
 布尔类型
 
 - bool：值为ture或者false
+
+### 类型转换
+
+- int()：转整数
+- uint()：转无符号整数
+- float64()/float32()：转浮点数
+
+```go
+a := "1"
+b := 2
+// ，strconv是go提供的包
+// 字符串转数字，Atoi = ASCII to int
+// _表示不接收，因为这个函数会发送失败信息，而我们不需要
+newA, _ := strconv.Atoi(a)
+
+// 数字转字符串，Itoa = int to ASCII
+newB := strconv.Itoa(b)
+
+fmt.Println(b + newA, a + newB)
+fmt.Printf("类型：%T，值：%#v", newB, newB) // #意为原始值，这里带#输出字符串有引号，不带#则无
+
+str := "1"
+// 字符串转布尔
+boolean, _ := strconv.ParseBool(str)
+
+// 布尔转字符串
+newStr := strconv.FormatBool(true)
+```
+
+> ParseBool 能识别的真值：1、t、T、TRUE、true、True；假值有：0、f、F、FALSE、false、False。其他字符串都会转换失败
+
+> 相较于js的转换，明显要严格的多
+
+## 数组和切片
+
+数组需要定义长度，且不能扩容，而切片不限制。
+
+```go
+// 定义一个长度为3，值为字符串的数组
+hobby := [3]string{"唱", "跳", "rap"}
+
+// 读值、读长度、修改
+// hobby[0]
+// len(hobby)
+// hobby[0] = "篮球"
+
+// 定义一个切片
+s := []int{1, 2, 3}
+// 向切片后面插入
+s = append(s, 4, 5, 6)
+// 前面插入
+s = append([]int{-1, 0}, s...)
+// 截取：s[开始索引:结束索引] s[0:4]
+```
+
+## 结构体
+
+一种组合多个不同类型的复合数据类型
+
+```go
+package main // 包名
+
+type Car stuct {
+	Model string
+}
+
+type Person[P string | int] struct {
+  sex string // 首字母小写，表示私有，当前包（main）访问
+  Name string // 首字母大写，表示公开，所有包可访问
+  Age int
+	Car Car
+	// Car，省略结构体嵌套的名称，则变为结构体嵌入，可以理解为属性被平铺合并进来
+	Phone P // 泛型结构体，go没有联合类型
+}
+
+func main() {
+  // person := Person[string]{} 不传参数也可创建，默认零值
+	// 匿名结构体
+	person := struct {
+		Name string
+	}{
+		Name "云成舟"
+	}
+}
+
+// 读值、
+```
