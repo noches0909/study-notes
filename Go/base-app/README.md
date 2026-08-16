@@ -205,6 +205,8 @@ for index, value := range arr {
 循环字符串有点麻烦，会返回字节下标和unicode编码，通常转为切片`[]rune(str)`进行循环
 ```
 
+> for循环的使用与js基本一致，range可以理解为foreach
+
 ## 函数
 
 ```go
@@ -217,3 +219,5 @@ clac[uint](20, 10)
 // 匿名函数（自运行函数），创建即执行
 func () {}()
 ```
+
+> 函数的用法与js基本一致
