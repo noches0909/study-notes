@@ -168,3 +168,52 @@ value, ok := scores["xx"]
 // 修改属性
 scores["英语"] = 100
 ```
+
+## 条件判断
+
+```go
+var age int
+// scan 可供用户在终端进行输入，参数就是输入的值
+fmt.Scan(&age) // 函数的传参是复制，不加&的话，值更改后无法回显，加上&意为将地址值也传
+
+if age >= 18 {
+	fmt.Println("成年")
+} else {
+	fmt.Println("未成年")
+}
+```
+
+> if else if、switch case、&& || ! 等条件运算功能与js基本一致
+
+## for循环
+
+go语言中没有while相关的循环
+
+```go
+arr := [3]int{1, 2, 3}
+
+for i := 0; i < len(arr); i++ {
+	fmt.Println(arr[i])
+	// break 跳出循环
+	// continue 跳过循环
+}
+
+for index, value := range arr {
+	fmt.Println(index, value)
+}
+
+循环字符串有点麻烦，会返回字节下标和unicode编码，通常转为切片`[]rune(str)`进行循环
+```
+
+## 函数
+
+```go
+// 具名函数，需要调用才会执行
+func clac[T int | uint | float64](a, b T) (T, T) {
+	return a + b, a - b
+}
+
+clac[uint](20, 10)
+// 匿名函数（自运行函数），创建即执行
+func () {}()
+```
