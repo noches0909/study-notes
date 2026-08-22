@@ -221,3 +221,33 @@ func () {}()
 ```
 
 > 函数的用法与js基本一致
+
+## 面向对象
+
+```go
+// 接口定义函数
+type Payment interface {
+	Pay(money float64) (string, float64)
+}
+
+// 结构体定义属性
+type AliPay struct {
+	AppId string
+}
+
+func (a AliPay) Pay(money float64) (string, float64) {
+	fmt.Println("zfbId", a.AppId)
+	return "支付成功", money
+}
+
+// 业务层封装
+func CreateOrder(pay Payment, money float64) {
+	str,num := pay.Pay(money)
+	fmt.Println(str, num)
+}
+
+// 初始化
+func main() {
+	CreateOrder(AliPay{AppId: "zfb_xxx"}, 66.66)
+}
+```
