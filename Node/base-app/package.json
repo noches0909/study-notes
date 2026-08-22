@@ -1,23 +1,27 @@
 {
-  "name": "base-app",
+  "name": "node-basics-examples",
   "version": "1.0.0",
-  "description": "Node.js并不是一门编程语言，编程语言是js/ts，他和bun.js一样，是js的运行时。",
-  "main": "index.js",
+  "private": true,
+  "description": "Node.js 学习笔记配套的 CLI 与服务端 HTML 生成示例",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "cli": "node ./testCli.js",
+    "ssr": "node ./ssrDemo.js",
+    "check:cli": "node --check ./testCli.js",
+    "check:ssr": "node --check ./ssrDemo.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "bin": {
     "test-cli": "./testCli.js"
   },
   "dependencies": {
     "commander": "^14.0.3",
-    "download-git-repo": "^3.0.2",
     "inquirer": "^13.4.2",
-    "jsdom": "^29.0.2",
-    "ora": "^9.4.0"
+    "jsdom": "^29.0.2"
   }
 }
