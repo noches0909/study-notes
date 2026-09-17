@@ -1,0 +1,15 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Java build outputs
+*.class
+target/
+build/
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
