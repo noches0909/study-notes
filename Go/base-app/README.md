@@ -378,3 +378,45 @@ select {
 读写锁：`sync.RWMutex`相比于互斥锁，它读的时候是共享的不会互斥
 
 `Lock()`、`Unlock()`：开锁、关锁
+
+#### GMP调度
+
+Goroutine：协程、任务
+Machine：OS内核线程
+Processor：逻辑处理器
+
+M必须绑定P才能跑G，在过去的旧版本没有P的概念，导致M需要抢夺G，性能较差，现代化的P会有最多256个本地G，本地队列放满了才会放到全局队列。
+
+Work Stealing 工作窃取：P队列跑完了本地和全局会偷取其他P队列一半的任务，以避免CPU的空闲
+Hand-off交接：有G被阻塞的时候，M会和P解绑，P会去重新找空闲M或创造M，以确保多核不浪费
+
+### 操作文件
+
+go里的所有文件操作都引用os包
+
+```go
+// 创建文件
+file, _ := fs.Create("index.txt")
+// 追加内容两种方式
+file.WriteString("1")
+file.Wirte([]byte("2"))
+
+// 读取文件
+data, _ := fs.ReadFile("index.txt")
+fmt.Println(string(data))
+
+// 读取元信息
+fileInfo, _ := fs.Stat("index.txt")
+
+// 删除文件
+fs.Remove("index.txt")
+
+file.Close()
+```
+
+```go
+// 参数：name（string 文件名）、flag（int 枚举约束操作行为方式）、perm（全校 win无效）
+fs.OpenFile("index.txt", fs.O_RDWR | fs.O_CREATE | fs.O_APPEND, 0o777)
+```
+
+> 关于权限：0o是八进制，777分别是文件的所有者、用户组、其他人的权限，7=4 2 1，4可读r、2可写w、1可执行x
